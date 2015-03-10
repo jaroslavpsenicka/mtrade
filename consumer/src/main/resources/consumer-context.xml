@@ -1,0 +1,57 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:task="http://www.springframework.org/schema/task"
+   xmlns:int="http://www.springframework.org/schema/integration"
+   xmlns:int-kafka="http://www.springframework.org/schema/integration/kafka"
+   xmlns:mvc="http://www.springframework.org/schema/mvc"
+   xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+    http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka-1.0.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:annotation-config />
+    <context:component-scan base-package="com.mtrade.consumer" />
+    <task:annotation-driven />
+    <mvc:annotation-driven/>
+
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <int:gateway id="requestsGW" service-interface="com.mtrade.consumer.RequestProcessorGateway"
+         default-request-channel="requests"/>
+
+    <int:channel id="requests">
+        <int:queue capacity="1000"/>
+    </int:channel>
+
+    <bean id="stringEncoder" class="org.springframework.integration.kafka.serializer.common.StringEncoder"/>
+    <bean id="kryoEncoderPrototype" class="com.mtrade.dao.serializer.KryoEncoder" scope="prototype" lazy-init="true"/>
+    <bean id="kryoEncoder" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="targetSource">
+            <bean class="org.springframework.aop.target.CommonsPoolTargetSource">
+                <property name="targetClass" value="com.mtrade.dao.serializer.KryoEncoder"/>
+                <property name="targetBeanName" value="kryoEncoderPrototype"/>
+                <property name="maxSize" value="10"/>
+                <property name="maxWait" value="5000"/>
+            </bean>
+        </property>
+    </bean>
+
+    <int-kafka:producer-context id="producerContext">
+        <int-kafka:producer-configurations>
+            <int-kafka:producer-configuration topic=".*" broker-list="localhost:9092"
+                key-class-type="java.lang.String" value-class-type="com.mtrade.dao.model.TradeRequest"
+                key-encoder="stringEncoder" value-encoder="kryoEncoder" />
+        </int-kafka:producer-configurations>
+    </int-kafka:producer-context>
+
+    <task:executor id="requestsUnloader" pool-size="2" />
+    <int-kafka:outbound-channel-adapter id="outboundChannelAdapter" kafka-producer-context-ref="producerContext"
+        auto-startup="true" channel="requests" topic="REQS">
+        <int:poller task-executor="requestsUnloader" fixed-rate="500"/>
+    </int-kafka:outbound-channel-adapter>
+
+</beans>
