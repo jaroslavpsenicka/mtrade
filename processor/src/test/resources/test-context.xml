@@ -11,4 +11,16 @@
     http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka-1.0.xsd
     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
+    <bean id="consumerContext" class="org.mockito.Mockito" factory-method="mock" primary="true">
+        <constructor-arg value="org.springframework.integration.kafka.support.KafkaConsumerContext"/>
+    </bean>
+
+    <int:gateway id="inboundChannelAdapter" default-request-channel="requests"
+         service-interface="com.mtrade.processor.RequestTestGW"/>
+
+    <bean id="mongo" factory-bean="fongo" factory-method="getMongo" />
+    <bean name="fongo" class="com.github.fakemongo.Fongo">
+        <constructor-arg value="InMemoryMongo" />
+    </bean>
+
 </beans>

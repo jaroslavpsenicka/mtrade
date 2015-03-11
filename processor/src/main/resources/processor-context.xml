@@ -2,6 +2,7 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:context="http://www.springframework.org/schema/context"
    xmlns:task="http://www.springframework.org/schema/task"
+   xmlns:mongo="http://www.springframework.org/schema/data/mongo"
    xmlns:int="http://www.springframework.org/schema/integration"
    xmlns:int-kafka="http://www.springframework.org/schema/integration/kafka"
    xsi:schemaLocation="
@@ -9,7 +10,8 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
     http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
     http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-    http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka-1.0.xsd">
+    http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka-1.0.xsd
+    http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
     <context:annotation-config />
     <context:component-scan base-package="com.mtrade.processor" />
@@ -40,14 +42,21 @@
 
     <task:executor id="requestWriterExecutor" pool-size="2" />
 
-    <int-kafka:inbound-channel-adapter id="inboundChannelAdapter" kafka-consumer-context-ref="consumerContext" channel="requestsRaw" auto-startup="true">
+    <mongo:repositories base-package="com.mtrade.processor.repository"/>
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongo" ref="mongo"/>
+        <constructor-arg name="databaseName" value="mtrade"/>
+    </bean>
+
+    <mongo:mongo id="mongo" host="localhost">
+        <mongo:options auto-connect-retry="true"/>
+    </mongo:mongo>
+
+    <int-kafka:inbound-channel-adapter id="inboundChannelAdapter" kafka-consumer-context-ref="consumerContext"
+        channel="requests" auto-startup="true">
         <int:poller fixed-rate="500" time-unit="MILLISECONDS" task-executor="requestWriterExecutor"/>
     </int-kafka:inbound-channel-adapter>
-
-    <int:channel id="requestsRaw"/>
-
-    <bean id="messageSplitter" class="com.mtrade.processor.Splitter" />
-    <int:splitter input-channel="requestsRaw" output-channel="requests" ref="messageSplitter" method="split"/>
 
     <int:channel id="requests"/>
 
