@@ -66,7 +66,7 @@ public class MarketControllerTest {
 
     @Test
     public void validRequest() throws Exception {
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isOk())
@@ -90,7 +90,7 @@ public class MarketControllerTest {
     @Test
     public void shortUserId() throws Exception {
         ((ObjectNode)content).put("userId", "");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -105,7 +105,7 @@ public class MarketControllerTest {
         char[] chars = new char[200];
         Arrays.fill(chars, '1');
         ((ObjectNode)content).put("userId", new String(chars));
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -118,7 +118,7 @@ public class MarketControllerTest {
     @Test
     public void wrongFromCurrency() throws Exception {
         ((ObjectNode)content).put("currencyFrom", "!@#");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -131,7 +131,7 @@ public class MarketControllerTest {
     @Test
     public void shortFromCurrency() throws Exception {
         ((ObjectNode)content).put("currencyFrom", "CZ");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -144,7 +144,7 @@ public class MarketControllerTest {
     @Test
     public void spaceInFromCurrency() throws Exception {
         ((ObjectNode)content).put("currencyFrom", "CZK ");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -157,7 +157,7 @@ public class MarketControllerTest {
     @Test
     public void wrongToCurrency() throws Exception {
         ((ObjectNode)content).put("currencyTo", "OMG");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -170,7 +170,7 @@ public class MarketControllerTest {
     @Test
     public void wrongCountry() throws Exception {
         ((ObjectNode)content).put("originatingCountry", "11");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -183,7 +183,7 @@ public class MarketControllerTest {
     @Test
     public void tooMuchToSell() throws Exception {
         ((ObjectNode)content).put("amountSell", "1100000");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -196,7 +196,7 @@ public class MarketControllerTest {
     @Test
     public void tooMuchToBuy() throws Exception {
         ((ObjectNode)content).put("amountBuy", "1100000");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -209,7 +209,7 @@ public class MarketControllerTest {
     @Test
     public void negativeRate() throws Exception {
         ((ObjectNode)content).put("rate", "-1");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -222,7 +222,7 @@ public class MarketControllerTest {
     @Test
     public void equalCurrencyCodes() throws Exception {
         ((ObjectNode)content).put("currencyTo", "EUR");
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isBadRequest())
@@ -238,7 +238,7 @@ public class MarketControllerTest {
         beanFactory.removeBeanDefinition("transactionIdGenerator");
         beanFactory.registerBeanDefinition("transactionIdGenerator", new RootBeanDefinition(ErrorTxIdGenerator.class));
 
-        MvcResult result = mockMvc.perform(post("/market/trade")
+        MvcResult result = mockMvc.perform(post("/request")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .content(content.toString()))
             .andExpect(status().isInternalServerError())

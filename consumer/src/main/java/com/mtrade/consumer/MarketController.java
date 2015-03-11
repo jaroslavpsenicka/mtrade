@@ -28,7 +28,6 @@ import com.mtrade.model.TradeResponse;
  * @author jaroslav.psenicka@gmail.com
  */
 @Controller
-@RequestMapping("/market")
 public class MarketController {
 
     @Autowired
@@ -40,7 +39,7 @@ public class MarketController {
     private static final Logger LOG = LoggerFactory.getLogger(MarketController.class);
 
     @ResponseBody
-    @RequestMapping(value = "/trade", method = RequestMethod.POST,
+    @RequestMapping(value = "/request", method = RequestMethod.POST,
         consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public TradeResponse trade(@Valid @RequestBody TradeRequest tradeRequest, HttpServletRequest httpRequest) {
