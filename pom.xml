@@ -10,8 +10,9 @@
     <packaging>pom</packaging>
     <version>0.1.0-SNAPSHOT</version>
     <modules>
-        <module>dao</module>
+        <module>model</module>
         <module>consumer</module>
+        <module>processor</module>
     </modules>
 
     <repositories>
@@ -80,11 +81,16 @@
 				<artifactId>spring-expression</artifactId>
 				<version>4.1.2.RELEASE</version>
 			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-web</artifactId>
-				<version>4.1.2.RELEASE</version>
-			</dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>4.1.2.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>4.1.2.RELEASE</version>
+            </dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
@@ -159,6 +165,22 @@
                 <groupId>com.esotericsoftware</groupId>
                 <artifactId>kryo</artifactId>
                 <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>1.2.1.RELEASE</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-log4j</artifactId>
+                <version>1.2.1.RELEASE</version>
             </dependency>
 
             <dependency>

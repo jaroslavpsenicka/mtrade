@@ -1,4 +1,4 @@
-package com.mtrade.dao.model;
+package com.mtrade.model;
 
 /**
  * @author jaroslav.psenicka@gmail.com

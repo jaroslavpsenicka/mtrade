@@ -2,7 +2,7 @@ package com.mtrade.consumer;
 
 import org.springframework.integration.annotation.Header;
 
-import com.mtrade.dao.model.TradeRequest;
+import com.mtrade.model.TradeRequest;
 
 public interface RequestProcessorGateway {
 

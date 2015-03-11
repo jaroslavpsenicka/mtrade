@@ -1,0 +1,57 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:task="http://www.springframework.org/schema/task"
+   xmlns:int="http://www.springframework.org/schema/integration"
+   xmlns:int-kafka="http://www.springframework.org/schema/integration/kafka"
+   xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+    http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka-1.0.xsd">
+
+    <context:annotation-config />
+    <context:component-scan base-package="com.mtrade.processor" />
+    <task:annotation-driven />
+
+    <int-kafka:zookeeper-connect id="zookeeper" zk-connect="localhost:2181" />
+
+    <int-kafka:consumer-context id="consumerContext" zookeeper-connect="zookeeper">
+        <int-kafka:consumer-configurations>
+            <int-kafka:consumer-configuration group-id="processors" value-decoder="kryoCodec" key-decoder="stringDecoder">
+                <int-kafka:topic id="REQS" streams="1" />
+            </int-kafka:consumer-configuration>
+        </int-kafka:consumer-configurations>
+    </int-kafka:consumer-context>
+
+    <bean id="stringDecoder" class="org.springframework.integration.kafka.serializer.common.StringDecoder"/>
+    <bean id="kryoCodecPrototype" class="com.mtrade.model.serializer.KryoCodec" scope="prototype" lazy-init="true"/>
+    <bean id="kryoCodec" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="targetSource">
+            <bean class="org.springframework.aop.target.CommonsPoolTargetSource">
+                <property name="targetClass" value="com.mtrade.model.serializer.KryoCodec"/>
+                <property name="targetBeanName" value="kryoCodecPrototype"/>
+                <property name="maxSize" value="10"/>
+                <property name="maxWait" value="5000"/>
+            </bean>
+        </property>
+    </bean>
+
+    <task:executor id="requestWriterExecutor" pool-size="2" />
+
+    <int-kafka:inbound-channel-adapter id="inboundChannelAdapter" kafka-consumer-context-ref="consumerContext" channel="requestsRaw" auto-startup="true">
+        <int:poller fixed-rate="500" time-unit="MILLISECONDS" task-executor="requestWriterExecutor"/>
+    </int-kafka:inbound-channel-adapter>
+
+    <int:channel id="requestsRaw"/>
+
+    <bean id="messageSplitter" class="com.mtrade.processor.Splitter" />
+    <int:splitter input-channel="requestsRaw" output-channel="requests" ref="messageSplitter" method="split"/>
+
+    <int:channel id="requests"/>
+
+    <bean id="requestWriter" class="com.mtrade.processor.RequestWriter" />
+    <int:outbound-channel-adapter channel="requests" ref="requestWriter" method="write"/>
+
+</beans>
