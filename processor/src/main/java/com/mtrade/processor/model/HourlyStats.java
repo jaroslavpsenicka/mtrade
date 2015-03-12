@@ -1,10 +1,13 @@
 package com.mtrade.processor.model;
 
+import com.mtrade.processor.StatsCalculator;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author jaroslav.psenicka@gmail.com
  */
+@Document
 public class HourlyStats {
 
     @Id

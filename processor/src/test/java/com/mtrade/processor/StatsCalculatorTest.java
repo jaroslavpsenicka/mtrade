@@ -2,8 +2,9 @@ package com.mtrade.processor;
 
 import com.mtrade.processor.model.HourlyStats;
 import com.mtrade.common.model.TradeRequest;
-import com.mtrade.processor.model.StatsExecutionInfo;
+import com.mtrade.processor.model.StatsExecution;
 import com.mtrade.processor.repository.HourlyStatsRepository;
+import com.mtrade.processor.repository.StatsExecutionRepository;
 import com.mtrade.processor.repository.TradeRequestRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -36,6 +37,9 @@ public class StatsCalculatorTest {
     private HourlyStatsRepository hourlyStatsRepository;
 
     @Autowired
+    private StatsExecutionRepository executionRepository;
+
+    @Autowired
     private MongoTemplate mongoTemplate;
 
     @Before
@@ -58,12 +62,13 @@ public class StatsCalculatorTest {
         req2.setCurrencyTo("EUR");
         req2.setOriginatingCountry("CZ");
         req2.setTimeCreated(new Date(1));
+        tradeRequestRepository.deleteAll();
         tradeRequestRepository.save(Arrays.asList(req1, req2));
+        hourlyStatsRepository.deleteAll();
     }
 
     @After
     public void after() {
-        tradeRequestRepository.deleteAll();
     }
 
     @Test
@@ -77,7 +82,7 @@ public class StatsCalculatorTest {
 
     @Test
     public void hourlyStatsExistingInfo() throws Exception {
-        mongoTemplate.save(new StatsExecutionInfo(new Date()));
+        executionRepository.save(new StatsExecution(StatsCalculator.HOUR, new Date()));
         calculator.calculateHourlyStats();
         assertEquals(0, hourlyStatsRepository.count());
     }
