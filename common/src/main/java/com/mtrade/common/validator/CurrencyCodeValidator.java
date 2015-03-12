@@ -2,13 +2,13 @@
 // Copyright (c) 2011-2015 Xanadu Consultancy Ltd., 
 //
 
-package com.mtrade.model.validator;
+package com.mtrade.common.validator;
 
 import java.util.Currency;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import com.mtrade.model.annotation.CurrencyCode;
+import com.mtrade.common.annotation.CurrencyCode;
 
 public class CurrencyCodeValidator implements ConstraintValidator<CurrencyCode, String> {
 

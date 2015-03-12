@@ -1,7 +1,5 @@
 package com.mtrade.processor;
 
-import com.mtrade.model.TradeRequest;
-
 import java.util.List;
 import java.util.Map;
 

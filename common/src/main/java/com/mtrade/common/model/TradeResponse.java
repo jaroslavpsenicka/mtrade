@@ -1,4 +1,4 @@
-package com.mtrade.model;
+package com.mtrade.common.model;
 
 /**
  * @author jaroslav.psenicka@gmail.com

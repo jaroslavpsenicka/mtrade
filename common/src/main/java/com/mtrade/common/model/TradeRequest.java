@@ -1,12 +1,15 @@
-package com.mtrade.model;
+package com.mtrade.common.model;
 
+import java.util.Date;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.mtrade.model.annotation.CurrencyCode;
-import com.mtrade.model.annotation.UnequalValues;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mtrade.common.annotation.CurrencyCode;
+import com.mtrade.common.annotation.UnequalValues;
 import de.malkusch.validation.constraints.Country;
 
 /**
@@ -41,9 +44,17 @@ public class TradeRequest {
     private Float rate;
 
     @NotNull
+    @JsonFormat(locale = "EN", shape = JsonFormat.Shape.STRING, pattern = "yy-MMM-dd hh:mm:ss")
+    private Date timePlaced;
+
+    @NotNull
     @Country
     private String originatingCountry;
 
+    @JsonIgnore
+    private Date timeCreated;
+
+    @JsonIgnore
     private String transactionId;
 
     public String getUserId() {
@@ -108,5 +119,21 @@ public class TradeRequest {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public Date getTimePlaced() {
+        return timePlaced;
+    }
+
+    public void setTimePlaced(Date timePlaced) {
+        this.timePlaced = timePlaced;
+    }
+
+    public Date getTimeCreated() {
+        return timeCreated;
+    }
+
+    public void setTimeCreated(Date timeCreated) {
+        this.timeCreated = timeCreated;
     }
 }

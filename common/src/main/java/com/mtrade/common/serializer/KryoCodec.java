@@ -2,14 +2,14 @@
 // Copyright (c) 2011-2015 Xanadu Consultancy Ltd., 
 //
 
-package com.mtrade.model.serializer;
+package com.mtrade.common.serializer;
 
 import java.io.ByteArrayOutputStream;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.mtrade.model.TradeRequest;
+import com.mtrade.common.model.TradeRequest;
 import kafka.serializer.Decoder;
 
 public class KryoCodec implements kafka.serializer.Encoder, Decoder {

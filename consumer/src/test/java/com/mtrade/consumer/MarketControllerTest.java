@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.http.MediaType;
@@ -25,7 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mtrade.model.TradeRequest;
+import com.mtrade.common.model.TradeRequest;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -77,7 +76,7 @@ public class MarketControllerTest {
         Message receivedMessage = messageReceiver.getLastMessage();
         assertNotNull(receivedMessage);
         assertNotNull(receivedMessage.getHeaders().get("transactionId"));
-        assertNotNull(((TradeRequest) receivedMessage.getPayload()).getTransactionId());
+        assertEquals(readTree.get("txId").asText(), ((TradeRequest) receivedMessage.getPayload()).getTransactionId());
         assertEquals("134256", ((TradeRequest) receivedMessage.getPayload()).getUserId());
         assertEquals("EUR", ((TradeRequest) receivedMessage.getPayload()).getCurrencyFrom());
         assertEquals("GBP", ((TradeRequest) receivedMessage.getPayload()).getCurrencyTo());
@@ -85,6 +84,24 @@ public class MarketControllerTest {
         assertEquals(new Float(747.1), ((TradeRequest) receivedMessage.getPayload()).getAmountBuy());
         assertEquals(new Float(1000.0), ((TradeRequest) receivedMessage.getPayload()).getAmountSell());
         assertEquals(new Float(0.7471), ((TradeRequest) receivedMessage.getPayload()).getRate());
+        assertNotNull(((TradeRequest) receivedMessage.getPayload()).getTimePlaced());
+        assertNotNull(((TradeRequest) receivedMessage.getPayload()).getTimeCreated());
+    }
+
+    @Test
+    public void propertyConflict() throws Exception {
+        ((ObjectNode)content).put("timeCreated", "10-10-10 10:20:30");
+        MvcResult result = mockMvc.perform(post("/request")
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .content(content.toString()))
+            .andExpect(status().isOk())
+            .andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        assertTrue(contentAsString.contains("txId"));
+        Message receivedMessage = messageReceiver.getLastMessage();
+        assertNotNull(receivedMessage);
+        long time = System.currentTimeMillis() - ((TradeRequest) receivedMessage.getPayload()).getTimeCreated().getTime();
+        assertTrue(time < 10000);
     }
 
     @Test

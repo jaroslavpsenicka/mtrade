@@ -1,5 +1,6 @@
 package com.mtrade.consumer;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -21,8 +22,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.mtrade.model.TradeRequest;
-import com.mtrade.model.TradeResponse;
+import com.mtrade.common.model.TradeRequest;
+import com.mtrade.common.model.TradeResponse;
 
 /**
  * @author jaroslav.psenicka@gmail.com
@@ -45,6 +46,7 @@ public class MarketController {
     public TradeResponse trade(@Valid @RequestBody TradeRequest tradeRequest, HttpServletRequest httpRequest) {
         String txId = txIdGenerator.generateId();
         tradeRequest.setTransactionId(txId);
+        tradeRequest.setTimeCreated(new Date());
         LOG.info(txId + ": request received from " + httpRequest.getRemoteAddr());
         requestProcessorGw.process(tradeRequest, txId);
         return new TradeResponse(txId);

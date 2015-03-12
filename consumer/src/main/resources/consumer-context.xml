@@ -27,11 +27,11 @@
     </int:channel>
 
     <bean id="stringEncoder" class="org.springframework.integration.kafka.serializer.common.StringEncoder"/>
-    <bean id="kryoCodecPrototype" class="com.mtrade.model.serializer.KryoCodec" scope="prototype" lazy-init="true"/>
+    <bean id="kryoCodecPrototype" class="com.mtrade.common.serializer.KryoCodec" scope="prototype" lazy-init="true"/>
     <bean id="kryoCodec" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="targetSource">
             <bean class="org.springframework.aop.target.CommonsPoolTargetSource">
-                <property name="targetClass" value="com.mtrade.model.serializer.KryoCodec"/>
+                <property name="targetClass" value="com.mtrade.common.serializer.KryoCodec"/>
                 <property name="targetBeanName" value="kryoCodecPrototype"/>
                 <property name="maxSize" value="10"/>
                 <property name="maxWait" value="5000"/>
@@ -42,7 +42,7 @@
     <int-kafka:producer-context id="producerContext">
         <int-kafka:producer-configurations>
             <int-kafka:producer-configuration topic=".*" broker-list="localhost:9092"
-                key-class-type="java.lang.String" value-class-type="com.mtrade.model.TradeRequest"
+                key-class-type="java.lang.String" value-class-type="com.mtrade.common.model.TradeRequest"
                 key-encoder="stringEncoder" value-encoder="kryoCodec" />
         </int-kafka:producer-configurations>
     </int-kafka:producer-context>

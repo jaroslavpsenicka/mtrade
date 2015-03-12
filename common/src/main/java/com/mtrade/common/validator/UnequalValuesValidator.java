@@ -2,7 +2,7 @@
 // Copyright (c) 2011-2015 Xanadu Consultancy Ltd., 
 //
 
-package com.mtrade.model.validator;
+package com.mtrade.common.validator;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import com.mtrade.model.annotation.UnequalValues;
+import com.mtrade.common.annotation.UnequalValues;
 
 public class UnequalValuesValidator implements ConstraintValidator<UnequalValues, Object> {
 

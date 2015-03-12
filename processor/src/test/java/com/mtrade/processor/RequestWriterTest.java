@@ -1,10 +1,13 @@
 package com.mtrade.processor;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
-import com.mtrade.model.TradeRequest;
-import com.mtrade.processor.repository.TradeRequestRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertEquals;
+import com.mtrade.common.model.TradeRequest;
+import com.mtrade.processor.repository.TradeRequestRepository;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author jaroslav.psenicka@gmail.com
@@ -30,6 +36,8 @@ public class RequestWriterTest {
 
     private TradeRequest req1;
     private TradeRequest req2;
+
+    private static final int RETRY = 20;
 
     @Before
     public void before() throws IOException {
@@ -65,7 +73,22 @@ public class RequestWriterTest {
         input.put("REQS", partitionData);
         requestGW.send(input);
 
-        assertEquals(2, repository.count());
+        retryUntilEquals(2L, new Callable() {
+            public Object call() throws Exception {
+                return repository.count();
+            }
+        });
+    }
+
+    private void retryUntilEquals(Object value, Callable callable) throws Exception {
+        for (int i = 0; i < RETRY; i++) {
+            if (value.equals(callable.call())) {
+                return;
+            }
+            Thread.sleep(100);
+        }
+
+        fail("value " + value + " not provided within " + (RETRY * 100) + "ms");
     }
 
 }

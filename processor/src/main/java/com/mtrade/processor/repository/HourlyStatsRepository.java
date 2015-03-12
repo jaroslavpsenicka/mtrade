@@ -1,6 +1,6 @@
 package com.mtrade.processor.repository;
 
-import com.mtrade.common.model.TradeRequest;
+import com.mtrade.processor.model.HourlyStats;
 import org.springframework.data.repository.CrudRepository;
 
 import java.math.BigInteger;
@@ -8,7 +8,7 @@ import java.math.BigInteger;
 /**
  * @author jaroslav.psenicka@gmail.com
  */
-public interface TradeRequestRepository extends CrudRepository<TradeRequest, BigInteger> {
+public interface HourlyStatsRepository extends CrudRepository<HourlyStats, BigInteger> {
 
 }
 

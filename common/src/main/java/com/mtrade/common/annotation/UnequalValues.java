@@ -2,7 +2,7 @@
 // Copyright (c) 2011-2015 Xanadu Consultancy Ltd., 
 //
 
-package com.mtrade.model.annotation;
+package com.mtrade.common.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import com.mtrade.model.validator.UnequalValuesValidator;
+import com.mtrade.common.validator.UnequalValuesValidator;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
