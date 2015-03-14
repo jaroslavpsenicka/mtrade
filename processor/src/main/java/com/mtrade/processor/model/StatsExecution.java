@@ -15,33 +15,28 @@ public class StatsExecution {
 
     @Id
     private String id;
-    private String type;
+    private StatsType type;
     private Date lastSuccess;
     private Date lastFailure;
 
-    public StatsExecution() {
+    private StatsExecution() {
         this.lastSuccess = new Date(0);
         this.lastFailure = new Date(0);
     }
 
-    public StatsExecution(String type) {
+    public StatsExecution(StatsType type) {
         this();
         this.type = type;
     }
 
-    public StatsExecution(String type, Date lastSuccessfulExecution) {
+    public StatsExecution(StatsType type, Date lastSuccessfulExecution) {
         this();
         this.type = type;
         this.lastSuccess = lastSuccessfulExecution;
     }
 
-
-    public String getType() {
+    public StatsType getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Date getLastSuccess() {

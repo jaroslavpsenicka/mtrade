@@ -1,16 +1,19 @@
 package com.mtrade.processor.repository;
 
+import com.mtrade.processor.model.Stats;
 import com.mtrade.processor.model.StatsExecution;
 import com.mtrade.processor.model.StatsType;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * @author jaroslav.psenicka@gmail.com
  */
-public interface StatsExecutionRepository extends MongoRepository<StatsExecution, BigInteger> {
+public interface StatsRepository extends MongoRepository<Stats, BigInteger> {
 
-    StatsExecution findByType(StatsType type);
+    List<Stats> findByType(StatsType type);
+
 }
 
