@@ -39,10 +39,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class KryoCodecTest {
 
     private KryoCodec codec;
+    private TradeRequest request;
 
     @Before
     public void before() throws IOException {
         this.codec = new KryoCodec();
+        request = new TradeRequest();
+        request.setUserId("123");
     }
 
     @After
@@ -51,8 +54,6 @@ public class KryoCodecTest {
 
     @Test
     public void encodeDecode() {
-        TradeRequest request = new TradeRequest();
-        request.setUserId("123");
         assertEquals("123", ((TradeRequest)codec.fromBytes(codec.toBytes(request))).getUserId());
     }
 
