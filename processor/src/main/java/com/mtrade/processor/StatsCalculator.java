@@ -4,10 +4,10 @@
 
 package com.mtrade.processor;
 
-import com.mtrade.processor.model.Stats;
+import com.mtrade.common.model.Stats;
 import com.mtrade.common.model.TradeRequest;
-import com.mtrade.processor.model.StatsType;
-import com.mtrade.processor.repository.StatsRepository;
+import com.mtrade.common.model.StatsType;
+import com.mtrade.common.repository.StatsRepository;
 import com.mtrade.processor.repository.StatsExecutionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import com.mtrade.processor.model.StatsExecution;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -58,6 +57,7 @@ public class StatsCalculator {
         StatsExecution execution = readExecutionInfo(StatsType.DAY);
         try {
             repository.save(getDailyStats(execution));
+            repository.save(getOverallStats(execution));
             execution.setLastSuccess(new Date());
         } catch (Exception ex) {
             LOG.error("Error calculating daily stats", ex);
@@ -95,7 +95,7 @@ public class StatsCalculator {
         Date createDate = new Date();
         Date midnight = new Date(System.currentTimeMillis() / MSINDAY * MSINDAY);
         AggregationOperation match = Aggregation.match(Criteria.where("createDate")
-            .gt(execution.getLastSuccess()).lte(midnight));
+            .gt(execution.getLastSuccess()).lte(midnight).and("type").is(StatsType.HOUR));
         AggregationOperation group = Aggregation.group("countryCode").avg("count").as("count");
         Aggregation agg = Aggregation.newAggregation(match, group);
         AggregationResults<Stats> results = this.mongoTemplate.aggregate(agg, Stats.class, Stats.class);
@@ -109,6 +109,24 @@ public class StatsCalculator {
         }
 
         return dailyStats;
+    }
+
+    private Iterable<Stats> getOverallStats(StatsExecution execution) {
+        Date createDate = new Date();
+        AggregationOperation match = Aggregation.match(Criteria.where("type").is(StatsType.DAY));
+        AggregationOperation group = Aggregation.group("countryCode").avg("count").as("count");
+        Aggregation agg = Aggregation.newAggregation(match, group);
+        AggregationResults<Stats> results = this.mongoTemplate.aggregate(agg, Stats.class, Stats.class);
+
+        List<Stats> overallStats = new ArrayList<>();
+        for (Stats result : results.getMappedResults()) {
+            Stats countryStats = new Stats(result.getId(), StatsType.OVERALL);
+            countryStats.setCreateDate(createDate);
+            countryStats.setCount(result.getCount());
+            overallStats.add(countryStats);
+        }
+
+        return overallStats;
     }
 
 }

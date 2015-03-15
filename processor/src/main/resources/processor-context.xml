@@ -14,7 +14,8 @@
     http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
     <context:annotation-config />
-    <context:component-scan base-package="com.mtrade.processor" />
+    <context:component-scan base-package="com.mtrade.common, com.mtrade.processor" />
+    <context:property-placeholder location="classpath:/mongodb.properties"/>
 
     <int-kafka:zookeeper-connect id="zookeeper" zk-connect="localhost:2181" />
 
@@ -50,14 +51,14 @@
         <task:scheduled ref="statsCalculator" method="calculateDailyStats" cron="0 0 0 * * *"/>
     </task:scheduled-tasks>
 
-    <mongo:repositories base-package="com.mtrade.processor.repository"/>
+    <mongo:repositories base-package="com.mtrade.common.repository, com.mtrade.processor.repository"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongo" ref="mongo"/>
-        <constructor-arg name="databaseName" value="mtrade"/>
+        <constructor-arg name="databaseName" value="${mongodb.db-name}"/>
     </bean>
 
-    <mongo:mongo id="mongo" host="localhost">
+    <mongo:mongo id="mongo" host="${mongodb.host}">
         <mongo:options auto-connect-retry="true"/>
     </mongo:mongo>
 

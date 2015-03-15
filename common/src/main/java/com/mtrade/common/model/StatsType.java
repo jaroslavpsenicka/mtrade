@@ -1,8 +1,8 @@
-package com.mtrade.processor.model;
+package com.mtrade.common.model;
 
 /**
  * @author jaroslav.psenicka@gmail.com
  */
 public enum StatsType {
-    HOUR, DAY
+    HOUR, DAY, OVERALL
 }

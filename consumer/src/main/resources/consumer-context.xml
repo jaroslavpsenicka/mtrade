@@ -15,6 +15,7 @@
 
     <context:annotation-config />
     <context:component-scan base-package="com.mtrade.consumer" />
+    <context:property-placeholder location="classpath:/kafka.properties"/>
     <mvc:annotation-driven/>
 
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
@@ -41,7 +42,7 @@
 
     <int-kafka:producer-context id="producerContext">
         <int-kafka:producer-configurations>
-            <int-kafka:producer-configuration topic=".*" broker-list="localhost:9092"
+            <int-kafka:producer-configuration topic=".*" broker-list="${kafka.broker-list}"
                 key-class-type="java.lang.String" value-class-type="com.mtrade.common.model.TradeRequest"
                 key-encoder="stringEncoder" value-encoder="kryoCodec" />
         </int-kafka:producer-configurations>

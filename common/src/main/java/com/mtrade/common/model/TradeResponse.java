@@ -1,10 +1,15 @@
 package com.mtrade.common.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * @author jaroslav.psenicka@gmail.com
  */
 public class TradeResponse {
 
+    @NotNull
     private String txId;
 
     public TradeResponse() {
@@ -18,7 +23,4 @@ public class TradeResponse {
         return txId;
     }
 
-    public void setTxId(String txId) {
-        this.txId = txId;
-    }
 }

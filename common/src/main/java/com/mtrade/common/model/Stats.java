@@ -1,24 +1,24 @@
-package com.mtrade.processor.model;
+package com.mtrade.common.model;
 
-import com.mtrade.processor.StatsCalculator;
-import oracle.jrockit.jfr.openmbean.JFRStatsType;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
  * @author jaroslav.psenicka@gmail.com
  */
-@Document
 public class Stats {
 
-    @Id
     private String id;
 
+    @NotNull
     private String countryCode;
+
+    @NotNull
     private StatsType type;
+
+    @NotNull
     private Date createDate;
+
     private float count;
 
     public Stats() {
@@ -35,10 +35,6 @@ public class Stats {
 
     public String getCountryCode() {
         return countryCode;
-    }
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
     }
 
     public StatsType getType() {

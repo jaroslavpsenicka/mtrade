@@ -1,7 +1,7 @@
 package com.mtrade.processor.repository;
 
 import com.mtrade.processor.model.StatsExecution;
-import com.mtrade.processor.model.StatsType;
+import com.mtrade.common.model.StatsType;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.math.BigInteger;

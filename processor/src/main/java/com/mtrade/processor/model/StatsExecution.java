@@ -4,10 +4,11 @@
 
 package com.mtrade.processor.model;
 
-import com.mtrade.processor.StatsCalculator;
+import com.mtrade.common.model.StatsType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Document
@@ -15,8 +16,14 @@ public class StatsExecution {
 
     @Id
     private String id;
+
+    @NotNull
     private StatsType type;
+
+    @NotNull
     private Date lastSuccess;
+
+    @NotNull
     private Date lastFailure;
 
     private StatsExecution() {

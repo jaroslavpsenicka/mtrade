@@ -1,10 +1,6 @@
-package com.mtrade.dao.repository;
+package com.mtrade.common.repository;
 
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-
+import com.mongodb.DBObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +8,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.stereotype.Component;
 
-import com.mongodb.DBObject;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import java.util.Set;
 
 /**
  * Based on http://maciejwalkowiak.pl/blog/2012/04/20/jsr-303-validation-with-spring-data-mongodb.
