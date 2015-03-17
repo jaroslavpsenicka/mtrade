@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Market Trade Monitor</title>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="http://jvectormap.com/css/jquery-jvectormap-2.0.1.css" type="text/css" media="screen"/>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="http://jvectormap.com/js/jquery-jvectormap-2.0.1.min.js"></script>
+        <script src="http://jvectormap.com/js/jquery-jvectormap-world-mill-en.js"></script>
+
+        <link rel="stylesheet" href="index.css">
+	</head>
+	<body ng-app="MonitorApp">
+        <div id="title">
+            <h2>Market Trade Monitor</h2>
+        </div>
+        <div id="user" ng-controller="UserCtrl">
+            <a href="https://www.facebook.com/jaroslav.psenicka.56" target="_new">
+                <div class="facebook"></div>
+            </a>
+            <a href="https://github.com/jaroslavpsenicka/mtrade" target="_new">
+                <div class="github"></div>
+            </a>
+            <div class="title">{{user.name}}</div>
+            <div class="logout" ng-click="logoff()"></div>
+        </div>
+        <div ng-controller="StatsCtrl">
+            <div id="map" map></div>
+            <div id="info">
+                <h1>This Month</h1>
+                <p>The graph shows the monthly average trading.</p>
+                <div class="graph"></div>
+                <h1>Currency Exchange</h1>
+                <p>The table shows top 5 of exchanged currencies.</p>
+                <table class="table-condensed">
+                    <thead>
+                        <tr>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EUR</td>
+                            <td>CZK</td>
+                            <td>5058472</td>
+                        </tr>
+                        <tr>
+                            <td>EUR</td>
+                            <td>CZK</td>
+                            <td>5058472</td>
+                        </tr>
+                        <tr>
+                            <td>EUR</td>
+                            <td>CZK</td>
+                            <td>5058472</td>
+                        </tr>
+                        <tr>
+                            <td>EUR</td>
+                            <td>CZK</td>
+                            <td>5058472</td>
+                        </tr>
+                        <tr>
+                            <td>EUR</td>
+                            <td>CZK</td>
+                            <td>5058472</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="tail"></div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-resource.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.js"></script>
+        <script src="index.js"></script>
+	</body>
+</html>

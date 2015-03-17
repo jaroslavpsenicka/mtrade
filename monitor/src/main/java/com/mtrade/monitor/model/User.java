@@ -17,6 +17,8 @@ public class User {
 	@Indexed(unique = true)
 	private String name;
 
+    private String displayName;
+
 	private String password;
 
 	@NotNull
@@ -54,7 +56,15 @@ public class User {
 		return name;
 	}
 
-	public String getPassword() {
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getPassword() {
 		return password;
 	}
 

@@ -37,6 +37,10 @@ public class Stats {
         return countryCode;
     }
 
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
     public StatsType getType() {
         return type;
     }

@@ -24,7 +24,8 @@
     <beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
 
     <beans:bean id="userDetailsService" class="com.mtrade.monitor.UserDetailServiceImpl">
-        <beans:property name="defaultAdminName" value="admin"/>
+        <beans:property name="defaultAdminLoginName" value="admin"/>
+        <beans:property name="defaultAdminDisplayName" value="Default Admin"/>
         <beans:property name="defaultAdminPassword" value="37fa265330ad83eaa879efb1e2db6380896cf639"/>
     </beans:bean>
 

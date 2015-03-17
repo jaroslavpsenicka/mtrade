@@ -109,7 +109,7 @@
                 <artifactId>maven-jetty-plugin</artifactId>
                 <version>6.1.10</version>
                 <configuration>
-                    <contextPath>/respnd</contextPath>
+                    <contextPath>/monitor</contextPath>
                     <!-- This is a Windows trick, files get locked while jetty is running,
                     see http://false.ekta.is/2010/12/jettyrun-maven-plugin-file-locking-on-windows-a-better-way/ -->
                     <connectors>

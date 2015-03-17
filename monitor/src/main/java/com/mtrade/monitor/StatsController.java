@@ -1,5 +1,7 @@
 package com.mtrade.monitor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.mtrade.common.model.Stats;
 import com.mtrade.common.model.StatsType;
 import com.mtrade.common.repository.StatsRepository;
@@ -26,10 +28,22 @@ public class StatsController {
     @ResponseBody
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value="/stats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Float> getOverallStats() {
+    public StatsResponse getOverallStats() {
         Map<String, Float> results = new HashMap<>();
         for (Stats stats : statsRepository.findByTypeOrderByCreateDateDesc(StatsType.OVERALL)) {
             results.put(stats.getCountryCode(), stats.getCount());
+        }
+
+        return new StatsResponse(results);
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value="/stats/tput", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<List<Number>> getThroughputStats() {
+        List<List<Number>> results = new ArrayList<>();
+        for (Stats stats : statsRepository.findFirst30ByTypeOrderByCreateDateDesc(StatsType.DAY)) {
+            results.add(0, Arrays.asList((Number) stats.getCreateDate().getTime(), stats.getCount()));
         }
 
         return results;
@@ -37,8 +51,8 @@ public class StatsController {
 
     @ResponseBody
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value="/stats/{countryCode}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<List<Number>> getCountryStats(@PathVariable("countryCode") String countryCode) {
+    @RequestMapping(value="/stats/tput/{countryCode}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<List<Number>> getThroughputCountryStats(@PathVariable("countryCode") String countryCode) {
         List<List<Number>> results = new ArrayList<>();
         for (Stats stats : statsRepository.findFirst30ByTypeAndCountryCodeOrderByCreateDateDesc(StatsType.DAY, countryCode)) {
             results.add(0, Arrays.asList((Number)stats.getCreateDate().getTime(), stats.getCount()));
@@ -47,4 +61,17 @@ public class StatsController {
         return results;
     }
 
+    private static class StatsResponse {
+
+        @JsonProperty("tput")
+        private Map<String, Float> tputStats;
+
+        public StatsResponse(Map<String, Float> tputStats) {
+            this.tputStats = tputStats;
+        }
+
+        public Map<String, Float> getTputStats() {
+            return tputStats;
+        }
+    }
 }

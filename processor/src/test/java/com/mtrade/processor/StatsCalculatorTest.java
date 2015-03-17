@@ -59,7 +59,8 @@ public class StatsCalculatorTest {
         req1.setCurrencyFrom("CZK");
         req1.setCurrencyTo("EUR");
         req1.setOriginatingCountry("CZ");
-        req1.setTimeCreated(new Date(1));
+        req1.setTimeCreated(new Date());
+        req1.setTimePlaced(new Date());
         TradeRequest req2 = new TradeRequest();
         req2.setUserId("user");
         req2.setTransactionId("tx");
@@ -68,7 +69,8 @@ public class StatsCalculatorTest {
         req2.setCurrencyFrom("CZK");
         req2.setCurrencyTo("EUR");
         req2.setOriginatingCountry("CZ");
-        req2.setTimeCreated(new Date(1));
+        req2.setTimeCreated(new Date());
+        req2.setTimePlaced(new Date());
         tradeRequestRepository.deleteAll();
         tradeRequestRepository.save(Arrays.asList(req1, req2));
         statsRepository.deleteAll();

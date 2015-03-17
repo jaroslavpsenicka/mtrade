@@ -18,5 +18,8 @@ public interface StatsRepository extends MongoRepository<Stats, BigInteger> {
 
     @Cacheable("stats")
     List<Stats> findFirst30ByTypeAndCountryCodeOrderByCreateDateDesc(StatsType type, String countryCode);
+
+    @Cacheable("stats")
+    List<Stats> findFirst30ByTypeOrderByCreateDateDesc(StatsType type);
 }
 

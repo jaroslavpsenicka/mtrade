@@ -17,6 +17,8 @@
     <context:component-scan base-package="com.mtrade.common, com.mtrade.processor" />
     <context:property-placeholder location="classpath:/mongodb.properties"/>
 
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
     <int-kafka:zookeeper-connect id="zookeeper" zk-connect="localhost:2181" />
 
     <int-kafka:consumer-context id="consumerContext" zookeeper-connect="zookeeper">

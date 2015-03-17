@@ -12,7 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -24,25 +23,34 @@ public class UserDetailServiceImpl implements UserDetailsService, InitializingBe
 	@Autowired
 	private UserRepository userRepository;
 
-	private String defaultAdminName;
+    private String defaultAdminLoginName;
+    private String defaultAdminDisplayName;
 	private String defaultAdminPassword;
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDetailServiceImpl.class);
 
-	public void setDefaultAdminName(String defaultAdminName) {
-		this.defaultAdminName = defaultAdminName;
+    @Required
+	public void setDefaultAdminLoginName(String defaultAdminName) {
+		this.defaultAdminLoginName = defaultAdminName;
 	}
 
-	public void setDefaultAdminPassword(String defaultAdminPassword) {
+    @Required
+    public void setDefaultAdminDisplayName(String defaultAdminDisplayName) {
+        this.defaultAdminDisplayName = defaultAdminDisplayName;
+    }
+
+    @Required
+    public void setDefaultAdminPassword(String defaultAdminPassword) {
 		this.defaultAdminPassword = defaultAdminPassword;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		User user = userRepository.findByName(defaultAdminName);
-		if (user == null && !StringUtils.isEmpty(defaultAdminName)) {
-			LOG.info("Default admin '" + defaultAdminName + "' not found, creating one.");
-			User defaultAdmin = new User(defaultAdminName, "ADMIN");
+		User user = userRepository.findByName(defaultAdminLoginName);
+		if (user == null && !StringUtils.isEmpty(defaultAdminLoginName)) {
+			LOG.info("Default admin '" + defaultAdminLoginName + "' not found, creating one.");
+			User defaultAdmin = new User(defaultAdminLoginName, "ADMIN");
+            defaultAdmin.setDisplayName(defaultAdminDisplayName);
 			defaultAdmin.setPassword(defaultAdminPassword);
 			userRepository.save(defaultAdmin);
 		}
@@ -59,12 +67,14 @@ public class UserDetailServiceImpl implements UserDetailsService, InitializingBe
 
 	public static class UserDetailsImpl implements UserDetails {
 		
-		private String username;
+		private String userName;
+        private String displayName;
 		private String password;
 		private List<SimpleGrantedAuthority> roles;
 		
-		private UserDetailsImpl(User user) {
-			this.username = user.getName();
+		public UserDetailsImpl(User user) {
+			this.userName = user.getName();
+            this.displayName = user.getDisplayName();
 			this.password = user.getPassword();
 			this.roles = new ArrayList<SimpleGrantedAuthority>();
 			if (user.getRoles() != null) for (String role : user.getRoles()) {
@@ -73,10 +83,14 @@ public class UserDetailServiceImpl implements UserDetailsService, InitializingBe
 		}
 		
 		public String getUsername() {
-			return username;
+			return userName;
 		}
-		
-		public String getPassword() {
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public String getPassword() {
 			return password;
 		}
 		

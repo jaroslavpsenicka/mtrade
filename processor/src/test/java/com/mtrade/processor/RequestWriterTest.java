@@ -1,11 +1,7 @@
 package com.mtrade.processor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
@@ -49,6 +45,8 @@ public class RequestWriterTest {
         req1.setCurrencyFrom("CZK");
         req1.setCurrencyTo("EUR");
         req1.setOriginatingCountry("CZ");
+        req1.setTimeCreated(new Date(0));
+        req1.setTimePlaced(new Date(0));
         req2 = new TradeRequest();
         req2.setUserId("user");
         req2.setTransactionId("tx");
@@ -57,6 +55,8 @@ public class RequestWriterTest {
         req2.setCurrencyFrom("CZK");
         req2.setCurrencyTo("EUR");
         req2.setOriginatingCountry("CZ");
+        req2.setTimeCreated(new Date(0));
+        req2.setTimePlaced(new Date(0));
 
         repository.deleteAll();
     }
