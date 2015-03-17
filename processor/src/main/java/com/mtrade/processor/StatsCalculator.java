@@ -4,14 +4,17 @@
 
 package com.mtrade.processor;
 
-import com.mtrade.common.model.Stats;
+import com.mtrade.common.model.ExchangeStats;
+import com.mtrade.common.model.ThroughputStats;
 import com.mtrade.common.model.TradeRequest;
 import com.mtrade.common.model.StatsType;
-import com.mtrade.common.repository.StatsRepository;
+import com.mtrade.common.repository.ExchangeStatsRepository;
+import com.mtrade.common.repository.ThroughputStatsRepository;
 import com.mtrade.processor.repository.StatsExecutionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -30,7 +33,10 @@ public class StatsCalculator {
     private StatsExecutionRepository executionRepository;
 
     @Autowired
-    private StatsRepository repository;
+    private ThroughputStatsRepository throughputStatsRepository;
+
+    @Autowired
+    private ExchangeStatsRepository exchangeStatsRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -42,7 +48,8 @@ public class StatsCalculator {
         LOG.info("Calculating hourly stats");
         StatsExecution execution = readExecutionInfo(StatsType.HOUR);
         try {
-            repository.save(getHourlyStats(execution));
+            throughputStatsRepository.save(getHourlyThroughputStats(execution));
+            exchangeStatsRepository.save(getExchangeStats(execution));
             execution.setLastSuccess(new Date());
         } catch (Exception ex) {
             LOG.error("Error calculating hourly stats", ex);
@@ -56,8 +63,8 @@ public class StatsCalculator {
         LOG.info("Calculating daily stats");
         StatsExecution execution = readExecutionInfo(StatsType.DAY);
         try {
-            repository.save(getDailyStats(execution));
-            repository.save(getOverallStats(execution));
+            throughputStatsRepository.save(getDailyThroughputStats(execution));
+            throughputStatsRepository.save(getOverallStats(execution));
             execution.setLastSuccess(new Date());
         } catch (Exception ex) {
             LOG.error("Error calculating daily stats", ex);
@@ -72,17 +79,18 @@ public class StatsCalculator {
         return (info != null) ? info : new StatsExecution(type);
     }
 
-    private Iterable<Stats> getHourlyStats(StatsExecution execution) {
+    private Iterable<ThroughputStats> getHourlyThroughputStats(StatsExecution execution) {
         Date createDate = new Date();
         AggregationOperation match = Aggregation.match(Criteria.where("timeCreated").gt(execution.getLastSuccess()));
         AggregationOperation group = Aggregation.group("originatingCountry").count().as("count");
         Aggregation agg = Aggregation.newAggregation(match, group);
-        AggregationResults<Stats> results = this.mongoTemplate.aggregate(agg, TradeRequest.class, Stats.class);
+        AggregationResults<ThroughputStats> results = this.mongoTemplate.aggregate(agg,
+            TradeRequest.class, ThroughputStats.class);
 
-        List<Stats> hourlyStats = new ArrayList<>();
+        List<ThroughputStats> hourlyStats = new ArrayList<>();
         long period = (createDate.getTime() - execution.getLastSuccess().getTime()) / 3600000;
-        for (Stats result : results.getMappedResults()) {
-            Stats countryStats = new Stats(result.getId(), StatsType.HOUR);
+        for (ThroughputStats result : results.getMappedResults()) {
+            ThroughputStats countryStats = new ThroughputStats(result.getId(), StatsType.HOUR);
             countryStats.setCreateDate(createDate);
             countryStats.setCount(result.getCount() / period);
             hourlyStats.add(countryStats);
@@ -91,18 +99,19 @@ public class StatsCalculator {
         return hourlyStats;
     }
 
-    private Iterable<Stats> getDailyStats(StatsExecution execution) {
+    private Iterable<ThroughputStats> getDailyThroughputStats(StatsExecution execution) {
         Date createDate = new Date();
         Date midnight = new Date(System.currentTimeMillis() / MSINDAY * MSINDAY);
         AggregationOperation match = Aggregation.match(Criteria.where("createDate")
             .gt(execution.getLastSuccess()).lte(midnight).and("type").is(StatsType.HOUR));
         AggregationOperation group = Aggregation.group("countryCode").avg("count").as("count");
         Aggregation agg = Aggregation.newAggregation(match, group);
-        AggregationResults<Stats> results = this.mongoTemplate.aggregate(agg, Stats.class, Stats.class);
+        AggregationResults<ThroughputStats> results = this.mongoTemplate.aggregate(agg,
+            ThroughputStats.class, ThroughputStats.class);
 
-        List<Stats> dailyStats = new ArrayList<>();
-        for (Stats result : results.getMappedResults()) {
-            Stats countryStats = new Stats(result.getId(), StatsType.DAY);
+        List<ThroughputStats> dailyStats = new ArrayList<>();
+        for (ThroughputStats result : results.getMappedResults()) {
+            ThroughputStats countryStats = new ThroughputStats(result.getId(), StatsType.DAY);
             countryStats.setCreateDate(createDate);
             countryStats.setCount(result.getCount());
             dailyStats.add(countryStats);
@@ -111,22 +120,42 @@ public class StatsCalculator {
         return dailyStats;
     }
 
-    private Iterable<Stats> getOverallStats(StatsExecution execution) {
+    private Iterable<ThroughputStats> getOverallStats(StatsExecution execution) {
         Date createDate = new Date();
         AggregationOperation match = Aggregation.match(Criteria.where("type").is(StatsType.DAY));
         AggregationOperation group = Aggregation.group("countryCode").avg("count").as("count");
         Aggregation agg = Aggregation.newAggregation(match, group);
-        AggregationResults<Stats> results = this.mongoTemplate.aggregate(agg, Stats.class, Stats.class);
+        AggregationResults<ThroughputStats> results = this.mongoTemplate.aggregate(agg,
+            ThroughputStats.class, ThroughputStats.class);
 
-        List<Stats> overallStats = new ArrayList<>();
-        for (Stats result : results.getMappedResults()) {
-            Stats countryStats = new Stats(result.getId(), StatsType.OVERALL);
+        List<ThroughputStats> overallStats = new ArrayList<>();
+        for (ThroughputStats result : results.getMappedResults()) {
+            ThroughputStats countryStats = new ThroughputStats(result.getId(), StatsType.OVERALL);
             countryStats.setCreateDate(createDate);
             countryStats.setCount(result.getCount());
             overallStats.add(countryStats);
         }
 
         return overallStats;
+    }
+
+    private Iterable<ExchangeStats> getExchangeStats(StatsExecution execution) {
+        Date createDate = new Date();
+        AggregationOperation group = Aggregation.group("currencyFrom", "currencyTo").count().as("count")
+            .sum("amountSell").as("amount");
+        AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
+        AggregationOperation limit = Aggregation.limit(5);
+        Aggregation agg = Aggregation.newAggregation(group, sort, limit);
+        AggregationResults<ExchangeStats> results = this.mongoTemplate.aggregate(agg,
+            TradeRequest.class, ExchangeStats.class);
+
+        List<ExchangeStats> exchangeStats = new ArrayList<>();
+        for (ExchangeStats result : results.getMappedResults()) {
+            result.setCreateDate(createDate);
+            exchangeStats.add(result);
+        }
+
+        return exchangeStats;
     }
 
 }

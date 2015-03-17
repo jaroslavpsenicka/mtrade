@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * @author jaroslav.psenicka@gmail.com
  */
-public class Stats {
+public class ThroughputStats {
 
     private String id;
 
@@ -21,10 +21,10 @@ public class Stats {
 
     private float count;
 
-    public Stats() {
+    public ThroughputStats() {
     }
 
-    public Stats(String countryCode, StatsType type) {
+    public ThroughputStats(String countryCode, StatsType type) {
         this.countryCode = countryCode;
         this.type = type;
     }

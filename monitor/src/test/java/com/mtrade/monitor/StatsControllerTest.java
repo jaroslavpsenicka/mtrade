@@ -1,17 +1,20 @@
 package com.mtrade.monitor;
 
-import com.mtrade.common.model.Stats;
+import com.mtrade.common.model.ExchangeStats;
+import com.mtrade.common.model.ThroughputStats;
 import com.mtrade.common.model.StatsType;
-import com.mtrade.common.repository.StatsRepository;
+import com.mtrade.common.repository.ExchangeStatsRepository;
+import com.mtrade.common.repository.ThroughputStatsRepository;
 import com.mtrade.monitor.model.User;
 import com.mtrade.monitor.repository.UserRepository;
 import net.sf.ehcache.Ehcache;
+import org.hamcrest.Matcher;
+import org.hamcrest.collection.IsMapContaining;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -29,12 +32,14 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,7 +58,10 @@ public class StatsControllerTest {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private StatsRepository statsRepository;
+    private ThroughputStatsRepository tputStatsRepository;
+
+    @Autowired
+    private ExchangeStatsRepository xchgStatsRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -69,20 +77,23 @@ public class StatsControllerTest {
     public void before() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         userRepository.save(new User("usr1"));
-        statsRepository.save(createStats(StatsType.DAY, "CZ", 1));
-        statsRepository.save(createStats(StatsType.DAY, "DE", 2));
-        statsRepository.save(createStats(StatsType.DAY, "DE", 3));
-        statsRepository.save(createStats(StatsType.DAY, "DE", 4));
-        statsRepository.save(createStats(StatsType.OVERALL, "CZ", 1));
-        statsRepository.save(createStats(StatsType.OVERALL, "DE", 3));
+        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "CZ", 1));
+        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "DE", 2));
+        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "DE", 3));
+        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "DE", 4));
+        tputStatsRepository.save(createThroughputStats(StatsType.OVERALL, "CZ", 1));
+        tputStatsRepository.save(createThroughputStats(StatsType.OVERALL, "DE", 3));
+
+        xchgStatsRepository.save(createExchangeStats("CZK", "EUR", 12));
     }
 
     @After
     public void after() {
-        statsRepository.deleteAll();
         userRepository.deleteAll();
+        tputStatsRepository.deleteAll();
+        xchgStatsRepository.deleteAll();
         SecurityContextHolder.getContext().setAuthentication(null);
-        Ehcache cache = (Ehcache) cacheManager.getCache("stats").getNativeCache();
+        Ehcache cache = (Ehcache) cacheManager.getCache("throughput-stats").getNativeCache();
         cache.removeAll();
     }
 
@@ -90,10 +101,16 @@ public class StatsControllerTest {
     public void overallStats() throws Exception {
         authenticate("usr1", "ADMIN");
         mockMvc.perform(get("/stats"))
+            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("tput.CZ", is(1.0)))
-            .andExpect(jsonPath("tput.DE", is(3.0)));
+            .andExpect(jsonPath("tput.DE", is(3.0)))
+            .andExpect(jsonPath("xchg", hasSize(1)))
+            .andExpect(jsonPath("xchg[0].currencyFrom", is("CZK")))
+            .andExpect(jsonPath("xchg[0].currencyTo", is("EUR")))
+            .andExpect(jsonPath("xchg[0].amount", is(12.0)))
+            .andExpect(jsonPath("xchg[0].count", is(1)));
     }
 
     @Test
@@ -121,8 +138,8 @@ public class StatsControllerTest {
 
     @Test
     public void overallCache() {
-        assertNotNull(statsRepository.findByTypeOrderByCreateDateDesc(StatsType.OVERALL));
-        Ehcache cache = (Ehcache) cacheManager.getCache("stats").getNativeCache();
+        assertNotNull(tputStatsRepository.findByTypeOrderByCreateDateDesc(StatsType.OVERALL));
+        Ehcache cache = (Ehcache) cacheManager.getCache("throughput-stats").getNativeCache();
         List keys = cache.getKeys();
         assertEquals(1, keys.size());
         assertEquals(StatsType.OVERALL, keys.get(0));
@@ -130,8 +147,8 @@ public class StatsControllerTest {
 
     @Test
     public void countryCache() {
-        assertNotNull(statsRepository.findFirst30ByTypeAndCountryCodeOrderByCreateDateDesc(StatsType.DAY, "CZ"));
-        Ehcache cache = (Ehcache) cacheManager.getCache("stats").getNativeCache();
+        assertNotNull(tputStatsRepository.findFirst30ByTypeAndCountryCodeOrderByCreateDateDesc(StatsType.DAY, "CZ"));
+        Ehcache cache = (Ehcache) cacheManager.getCache("throughput-stats").getNativeCache();
         List keys = cache.getKeys();
         assertEquals(1, keys.size());
         assertTrue(keys.get(0).toString().contains(StatsType.DAY.name()));
@@ -178,11 +195,21 @@ public class StatsControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private Stats createStats(StatsType type, String country, int count) {
-        Stats stats = new Stats(country, StatsType.DAY);
+    private ThroughputStats createThroughputStats(StatsType type, String country, int count) {
+        ThroughputStats stats = new ThroughputStats(country, StatsType.DAY);
         stats.setCreateDate(new Date(timeConstant++));
         stats.setType(type);
         stats.setCount(count);
+        return stats;
+    }
+
+    private ExchangeStats createExchangeStats(String from, String to, float amount) {
+        ExchangeStats stats = new ExchangeStats();
+        stats.setCreateDate(new Date(timeConstant++));
+        stats.setCurrencyFrom(from);
+        stats.setCurrencyTo(to);
+        stats.setAmount(amount);
+        stats.setCount(1);
         return stats;
     }
 

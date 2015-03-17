@@ -34,45 +34,40 @@
                 <p>The graph shows the monthly average trading.</p>
                 <div class="graph"></div>
                 <h1>Currency Exchange</h1>
-                <p>The table shows top 5 of exchanged currencies.</p>
+                <p>The table shows top 5 most exchanged currencies.</p>
                 <table class="table-condensed">
                     <thead>
                         <tr>
                             <th>From</th>
                             <th>To</th>
-                            <th>Amount</th>
+                            <th>Txs</th>
+                            <th class="align-right">Total Amount</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody ng-repeat="rec in stats.xchg">
                         <tr>
-                            <td>EUR</td>
-                            <td>CZK</td>
-                            <td>5058472</td>
-                        </tr>
-                        <tr>
-                            <td>EUR</td>
-                            <td>CZK</td>
-                            <td>5058472</td>
-                        </tr>
-                        <tr>
-                            <td>EUR</td>
-                            <td>CZK</td>
-                            <td>5058472</td>
-                        </tr>
-                        <tr>
-                            <td>EUR</td>
-                            <td>CZK</td>
-                            <td>5058472</td>
-                        </tr>
-                        <tr>
-                            <td>EUR</td>
-                            <td>CZK</td>
-                            <td>5058472</td>
+                            <td>{{rec.currencyFrom}}</td>
+                            <td>{{rec.currencyTo}}</td>
+                            <td>{{rec.count}}</td>
+                            <td class="align-right wide interesting">{{rec.amount}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div id="tail"></div>
+            <div id="bottomline">
+                <div class="meter">
+                    <div class="title">Input processing</div>
+                </div>
+                <div class="meter">
+                    <div class="title">Queue size</div>
+                </div>
+                <div class="meter">
+                    <div class="title">Queue throughput</div>
+                </div>
+                <div class="meter">
+                    <div class="title">Database size</div>
+                </div>
+            </div>
         </div>
 
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>

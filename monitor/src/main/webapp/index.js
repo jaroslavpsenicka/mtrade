@@ -25,6 +25,7 @@ app.directive('map', function() {
             var map = $(element).vectorMap({
                 map: 'world_mill_en',
                 zoomButtons: false,
+                zoomOnScrollSpeed: 6,
                 series: {
                     regions: [{
                         scale: ['#8db6c0', '#57d9f6']
@@ -33,7 +34,7 @@ app.directive('map', function() {
             });
 
             scope.$watch("stats" , function(value) {
-                map.vectorMap('get', 'mapObject').series.regions[0].setValues(scope.stats.tput);
+                map.vectorMap('get', 'mapObject').series.regions[0].setValues(value ? value.tput : undefined);
             });
         }
     }
