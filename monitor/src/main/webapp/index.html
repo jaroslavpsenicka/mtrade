@@ -30,7 +30,7 @@
         <div ng-controller="StatsCtrl">
             <div id="map" map ng-click="countrySelected(code, name)"></div>
             <div id="info">
-                <h1>{{countryName}} Today</h1>
+                <h1><span ng-bind="countryName"></span> Today</h1>
                 <p>The graph shows the most recent trading activity.</p>
                 <highchart id="tputChart" config="tputChart"></highchart>
                 <p class="topspace">The table shows top-ten most exchanged currencies.</p>
@@ -53,18 +53,14 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div ng-controller="JmxCtrl">
             <div id="bottomline">
-                <div class="meter">
-                    <div class="title">Input processing</div>
+                <div class="small-meter">
+                    <highchart id="loadChart" config="loadChart"></highchart>
                 </div>
-                <div class="meter">
-                    <div class="title">Queue size</div>
-                </div>
-                <div class="meter">
-                    <div class="title">Queue throughput</div>
-                </div>
-                <div class="meter">
-                    <div class="title">Database size</div>
+                <div class="wide-meter">
+                    <highchart id="topicChart" config="topicChart"></highchart>
                 </div>
             </div>
         </div>
@@ -74,6 +70,8 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.js"></script>
         <script src="http://code.highcharts.com/highcharts.js"></script>
         <script src="https://rawgithub.com/pablojim/highcharts-ng/master/dist/highcharts-ng.js"></script>
+        <script src="jolokia/jolokia-min.js"></script>
+        <script src="jolokia/jolokia-simple.js"></script>
         <script src="index.js"></script>
 	</body>
 </html>

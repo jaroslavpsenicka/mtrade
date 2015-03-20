@@ -135,27 +135,24 @@ h2 {
     position: absolute;
     height: 100px;
     left: 50px;
-    right: 400px;
-    bottom: 10px;
+    bottom: 0px;
     overflow: hidden;
 }
 
-#bottomline .meter {
+#bottomline .small-meter {
     display: inline-block;
     position: relative;
-    border: 1px dotted #ccc;
-    height: 100%;
+    height: 100px;
     width: 200px;
     margin: 0px 10px;
 }
 
-#bottomline .meter .title {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
-    width: 100%;
-    text-align: center;
-    font-size: 0.9em;
+#bottomline .wide-meter {
+    display: inline-block;
+    position: relative;
+    height: 100px;
+    width: 500px;
+    margin: 0px 10px;
 }
 
 .graph {
