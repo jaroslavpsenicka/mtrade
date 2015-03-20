@@ -1,14 +1,9 @@
 package com.mtrade.processor;
 
 import com.mtrade.common.model.ExchangeStats;
-import com.mtrade.common.model.StatsType;
-import com.mtrade.common.model.ThroughputStats;
 import com.mtrade.common.model.TradeRequest;
 import com.mtrade.common.repository.ExchangeStatsRepository;
-import com.mtrade.common.repository.ThroughputStatsRepository;
-import com.mtrade.processor.model.StatsExecution;
-import com.mtrade.processor.repository.StatsExecutionRepository;
-import com.mtrade.processor.repository.TradeRequestRepository;
+import com.mtrade.common.repository.TradeRequestRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,12 +18,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author jaroslav.psenicka@gmail.com
@@ -45,9 +38,6 @@ public class ExchangeStatsCalculatorTest {
 
     @Autowired
     private ExchangeStatsRepository statsRepository;
-
-    @Autowired
-    private StatsExecutionRepository executionRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -79,7 +69,6 @@ public class ExchangeStatsCalculatorTest {
         tradeRequestRepository.deleteAll();
         tradeRequestRepository.save(Arrays.asList(req1, req2));
         statsRepository.deleteAll();
-        executionRepository.deleteAll();
     }
 
     @After
@@ -88,7 +77,7 @@ public class ExchangeStatsCalculatorTest {
 
     @Test
     public void simpleExchangeStats() {
-        calculator.calculateHourlyStats();
+        calculator.calculateStats();
         Pageable page = new PageRequest(0, 5, Sort.Direction.DESC, "createDate");
         List<ExchangeStats> stats = statsRepository.find(page);
         assertEquals(1, stats.size());
@@ -113,7 +102,7 @@ public class ExchangeStatsCalculatorTest {
         req3.setTimePlaced(new Date());
         tradeRequestRepository.save(req3);
 
-        calculator.calculateHourlyStats();
+        calculator.calculateStats();
         Pageable page = new PageRequest(0, 5, Sort.Direction.DESC, "createDate");
         List<ExchangeStats> stats = statsRepository.find(page);
         assertEquals(2, stats.size());

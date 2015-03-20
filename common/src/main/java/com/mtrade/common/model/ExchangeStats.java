@@ -1,10 +1,7 @@
 package com.mtrade.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mtrade.common.annotation.CurrencyCode;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 

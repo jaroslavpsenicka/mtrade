@@ -28,23 +28,22 @@
             <div class="logout" ng-click="logoff()"></div>
         </div>
         <div ng-controller="StatsCtrl">
-            <div id="map" map></div>
+            <div id="map" map ng-click="countrySelected(code, name)"></div>
             <div id="info">
-                <h1>This Month</h1>
-                <p>The graph shows the monthly average trading.</p>
-                <div class="graph"></div>
-                <h1>Currency Exchange</h1>
-                <p>The table shows top 5 most exchanged currencies.</p>
+                <h1>{{countryName}} Today</h1>
+                <p>The graph shows the most recent trading activity.</p>
+                <highchart id="tputChart" config="tputChart"></highchart>
+                <p class="topspace">The table shows top-ten most exchanged currencies.</p>
                 <table class="table-condensed">
                     <thead>
                         <tr>
                             <th>From</th>
                             <th>To</th>
                             <th>Txs</th>
-                            <th class="align-right">Total Amount</th>
+                            <th class="align-right wide">Total Amount</th>
                         </tr>
                     </thead>
-                    <tbody ng-repeat="rec in stats.xchg">
+                    <tbody ng-cloak ng-repeat="rec in stats.xchg">
                         <tr>
                             <td>{{rec.currencyFrom}}</td>
                             <td>{{rec.currencyTo}}</td>
@@ -73,6 +72,8 @@
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-resource.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+        <script src="https://rawgithub.com/pablojim/highcharts-ng/master/dist/highcharts-ng.js"></script>
         <script src="index.js"></script>
 	</body>
 </html>

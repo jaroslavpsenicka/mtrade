@@ -1,9 +1,7 @@
 package com.mtrade.processor;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.Callable;
-
+import com.mtrade.common.model.TradeRequest;
+import com.mtrade.common.repository.TradeRequestRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.mtrade.common.model.TradeRequest;
-import com.mtrade.processor.repository.TradeRequestRepository;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 import static org.junit.Assert.fail;
 

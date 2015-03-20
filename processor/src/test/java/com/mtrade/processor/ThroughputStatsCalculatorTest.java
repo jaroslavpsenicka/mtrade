@@ -1,12 +1,9 @@
 package com.mtrade.processor;
 
-import com.mtrade.common.model.TradeRequest;
 import com.mtrade.common.model.ThroughputStats;
-import com.mtrade.processor.model.StatsExecution;
-import com.mtrade.common.model.StatsType;
+import com.mtrade.common.model.TradeRequest;
 import com.mtrade.common.repository.ThroughputStatsRepository;
-import com.mtrade.processor.repository.StatsExecutionRepository;
-import com.mtrade.processor.repository.TradeRequestRepository;
+import com.mtrade.common.repository.TradeRequestRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,12 +15,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author jaroslav.psenicka@gmail.com
@@ -40,9 +34,6 @@ public class ThroughputStatsCalculatorTest {
 
     @Autowired
     private ThroughputStatsRepository statsRepository;
-
-    @Autowired
-    private StatsExecutionRepository executionRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -74,7 +65,6 @@ public class ThroughputStatsCalculatorTest {
         tradeRequestRepository.deleteAll();
         tradeRequestRepository.save(Arrays.asList(req1, req2));
         statsRepository.deleteAll();
-        executionRepository.deleteAll();
     }
 
     @After
@@ -83,101 +73,11 @@ public class ThroughputStatsCalculatorTest {
 
     @Test
     public void hourlyStats() throws Exception {
-        calculator.calculateHourlyStats();
+        calculator.calculateStats();
         assertEquals(1, statsRepository.count());
         ThroughputStats stats = statsRepository.findAll().iterator().next();
         assertEquals("CZ", stats.getCountryCode());
-        assertEquals(StatsType.HOUR, stats.getType());
         assertEquals(5E-6, stats.getCount(), 1E-6);
     }
 
-    @Test
-    public void hourlyStatsExistingInfo() throws Exception {
-        executionRepository.save(new StatsExecution(StatsType.HOUR, new Date()));
-        calculator.calculateHourlyStats();
-        assertEquals(0, statsRepository.count());
-    }
-
-    @Test
-    public void dailyStats() {
-        statsRepository.save(createDailyStats("CZ", 0, 1));
-        statsRepository.save(createDailyStats("CZ", 1, 2));
-        statsRepository.save(createDailyStats("CZ", 2, 3));
-        calculator.calculateDailyStats();
-        List<ThroughputStats> stats = statsRepository.findByTypeOrderByCreateDateDesc(StatsType.DAY);
-        assertEquals(1, stats.size());
-        assertEquals("CZ", stats.get(0).getCountryCode());
-        assertEquals(StatsType.DAY, stats.get(0).getType());
-        assertEquals(2, stats.get(0).getCount(), 0.1);
-        assertNotNull(stats.get(0).getCreateDate());
-    }
-
-    @Test
-    public void dailyStatsExistingInfo() {
-        statsRepository.save(createDailyStats("CZ", 0, 1));
-        statsRepository.save(createDailyStats("CZ", 1, 2));
-        statsRepository.save(createDailyStats("CZ", 2, 3));
-        Date date = new Date();
-        executionRepository.save(new StatsExecution(StatsType.DAY, date));
-        calculator.calculateDailyStats();
-        List<ThroughputStats> statsList = statsRepository.findByTypeOrderByCreateDateDesc(StatsType.DAY);
-        assertEquals(0, statsList.size());
-    }
-
-    @Test
-    public void dailyStatsTwoCountries() {
-        statsRepository.save(createDailyStats("CZ", 0, 1));
-        statsRepository.save(createDailyStats("DE", 0, 2));
-        statsRepository.save(createDailyStats("DE", 2, 4));
-        calculator.calculateDailyStats();
-        List<ThroughputStats> stats = statsRepository.findByTypeOrderByCreateDateDesc(StatsType.DAY);
-        assertEquals(2, stats.size());
-        assertEquals("DE", stats.get(0).getCountryCode());
-        assertEquals(StatsType.DAY, stats.get(0).getType());
-        assertEquals(3, stats.get(0).getCount(), 1);
-        assertNotNull(stats.get(0).getCreateDate());
-        assertEquals("CZ", stats.get(1).getCountryCode());
-        assertEquals(StatsType.DAY, stats.get(1).getType());
-        assertEquals(1, stats.get(1).getCount(), 0.1);
-        assertNotNull(stats.get(1).getCreateDate());
-    }
-
-    @Test
-    public void overallStats() {
-        statsRepository.save(createDailyStats("CZ", 0, 1));
-        statsRepository.save(createDailyStats("CZ", 1, 2));
-        statsRepository.save(createDailyStats("CZ", 2, 3));
-        calculator.calculateDailyStats();
-        List<ThroughputStats> stats = statsRepository.findByTypeOrderByCreateDateDesc(StatsType.OVERALL);
-        assertEquals(1, stats.size());
-        assertEquals("CZ", stats.get(0).getCountryCode());
-        assertEquals(StatsType.OVERALL, stats.get(0).getType());
-        assertEquals(2, stats.get(0).getCount(), 0.1);
-        assertNotNull(stats.get(0).getCreateDate());
-    }
-
-    @Test
-    public void overallStatsTwoDays() {
-        statsRepository.save(createDailyStats("CZ", 0, 1));
-        statsRepository.save(createDailyStats("CZ", -30, 5));
-        calculator.calculateDailyStats();
-        List<ThroughputStats> stats = statsRepository.findByTypeOrderByCreateDateDesc(StatsType.OVERALL);
-        assertEquals(1, stats.size());
-        assertEquals("CZ", stats.get(0).getCountryCode());
-        assertEquals(StatsType.OVERALL, stats.get(0).getType());
-        assertEquals(3, stats.get(0).getCount(), 0.1);
-        assertNotNull(stats.get(0).getCreateDate());
-    }
-
-    private ThroughputStats createDailyStats(String country, int hourDiff, int count) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        cal.add(Calendar.HOUR, hourDiff);
-        ThroughputStats stats = new ThroughputStats();
-        stats.setType(StatsType.HOUR);
-        stats.setCountryCode(country);
-        stats.setCreateDate(cal.getTime());
-        stats.setCount(count);
-        return stats;
-    }
 }

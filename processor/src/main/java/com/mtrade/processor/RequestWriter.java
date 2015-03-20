@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.mtrade.common.model.TradeRequest;
-import com.mtrade.processor.repository.TradeRequestRepository;
+import com.mtrade.common.repository.TradeRequestRepository;
 
 public class RequestWriter {
 

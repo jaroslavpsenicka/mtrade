@@ -49,8 +49,7 @@
 
     <task:scheduler id="statsScheduler" pool-size="10"/>
     <task:scheduled-tasks scheduler="statsScheduler">
-        <task:scheduled ref="statsCalculator" method="calculateHourlyStats" cron="0 0 * * * *"/>
-        <task:scheduled ref="statsCalculator" method="calculateDailyStats" cron="0 0 0 * * *"/>
+        <task:scheduled ref="statsCalculator" method="calculateStats" cron="0 0 * * * *"/>
     </task:scheduled-tasks>
 
     <mongo:repositories base-package="com.mtrade.common.repository, com.mtrade.processor.repository"/>

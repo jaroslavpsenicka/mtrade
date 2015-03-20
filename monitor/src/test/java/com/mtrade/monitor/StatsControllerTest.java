@@ -2,14 +2,11 @@ package com.mtrade.monitor;
 
 import com.mtrade.common.model.ExchangeStats;
 import com.mtrade.common.model.ThroughputStats;
-import com.mtrade.common.model.StatsType;
 import com.mtrade.common.repository.ExchangeStatsRepository;
 import com.mtrade.common.repository.ThroughputStatsRepository;
 import com.mtrade.monitor.model.User;
 import com.mtrade.monitor.repository.UserRepository;
 import net.sf.ehcache.Ehcache;
-import org.hamcrest.Matcher;
-import org.hamcrest.collection.IsMapContaining;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,15 +30,11 @@ import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -77,13 +70,9 @@ public class StatsControllerTest {
     public void before() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         userRepository.save(new User("usr1"));
-        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "CZ", 1));
-        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "DE", 2));
-        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "DE", 3));
-        tputStatsRepository.save(createThroughputStats(StatsType.DAY, "DE", 4));
-        tputStatsRepository.save(createThroughputStats(StatsType.OVERALL, "CZ", 1));
-        tputStatsRepository.save(createThroughputStats(StatsType.OVERALL, "DE", 3));
-
+        tputStatsRepository.save(new ThroughputStats("CZ", new Date(1), new Float(1.0)));
+        tputStatsRepository.save(new ThroughputStats("DE", new Date(1), new Float(2.0)));
+        tputStatsRepository.save(new ThroughputStats("DE", new Date(10000), new Float(3.0)));
         xchgStatsRepository.save(createExchangeStats("CZK", "EUR", 12));
     }
 
@@ -93,15 +82,14 @@ public class StatsControllerTest {
         tputStatsRepository.deleteAll();
         xchgStatsRepository.deleteAll();
         SecurityContextHolder.getContext().setAuthentication(null);
-        Ehcache cache = (Ehcache) cacheManager.getCache("throughput-stats").getNativeCache();
+        Ehcache cache = (Ehcache) cacheManager.getCache("stats").getNativeCache();
         cache.removeAll();
     }
 
     @Test
-    public void overallStats() throws Exception {
+    public void actualStats() throws Exception {
         authenticate("usr1", "ADMIN");
         mockMvc.perform(get("/stats"))
-            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("tput.CZ", is(1.0)))
@@ -114,45 +102,34 @@ public class StatsControllerTest {
     }
 
     @Test
-    public void czStats() throws Exception {
+    public void throughputStats() throws Exception {
         authenticate("usr1", "ADMIN");
-        mockMvc.perform(get("/stats/tput/CZ"))
+        mockMvc.perform(get("/stats/tput"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0][1]", is(3.0)))
+            .andExpect(jsonPath("$[1][1]", is(3.0)));
+    }
+
+    @Test
+    public void czActualStats() throws Exception {
+        authenticate("usr1", "ADMIN");
+        mockMvc.perform(get("/stats?cc=CZ"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("tput.CZ", is(1.0)));
+    }
+
+    @Test
+    public void czThroughputStats() throws Exception {
+        authenticate("usr1", "ADMIN");
+        mockMvc.perform(get("/stats/tput?cc=CZ"))
+            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$[0][1]", is(1.0)));
-    }
-
-    @Test
-    public void deStats() throws Exception {
-        authenticate("usr1", "ADMIN");
-        mockMvc.perform(get("/stats/tput/DE"))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(3)))
-            .andExpect(jsonPath("$[0][1]", is(2.0)))
-            .andExpect(jsonPath("$[1][1]", is(3.0)))
-            .andExpect(jsonPath("$[2][1]", is(4.0)));
-    }
-
-    @Test
-    public void overallCache() {
-        assertNotNull(tputStatsRepository.findByTypeOrderByCreateDateDesc(StatsType.OVERALL));
-        Ehcache cache = (Ehcache) cacheManager.getCache("throughput-stats").getNativeCache();
-        List keys = cache.getKeys();
-        assertEquals(1, keys.size());
-        assertEquals(StatsType.OVERALL, keys.get(0));
-    }
-
-    @Test
-    public void countryCache() {
-        assertNotNull(tputStatsRepository.findFirst30ByTypeAndCountryCodeOrderByCreateDateDesc(StatsType.DAY, "CZ"));
-        Ehcache cache = (Ehcache) cacheManager.getCache("throughput-stats").getNativeCache();
-        List keys = cache.getKeys();
-        assertEquals(1, keys.size());
-        assertTrue(keys.get(0).toString().contains(StatsType.DAY.name()));
-        assertTrue(keys.get(0).toString().contains("CZ"));
     }
 
     @Test
@@ -193,14 +170,6 @@ public class StatsControllerTest {
         roles.add(new SimpleGrantedAuthority(role));
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, "pwd", roles);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
-    private ThroughputStats createThroughputStats(StatsType type, String country, int count) {
-        ThroughputStats stats = new ThroughputStats(country, StatsType.DAY);
-        stats.setCreateDate(new Date(timeConstant++));
-        stats.setType(type);
-        stats.setCount(count);
-        return stats;
     }
 
     private ExchangeStats createExchangeStats(String from, String to, float amount) {

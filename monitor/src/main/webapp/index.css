@@ -8,7 +8,7 @@ p {
 }
 
 h1 {
-    margin: 30px 0px 0px 0px;
+    margin: 30px 0px 10px 0px;
     color: #57D9F6;
     font-size: 1.5em;
 }
@@ -125,6 +125,10 @@ h2 {
 
 #info .table-condensed td {
     padding: 5px 20px 0px 5px;
+}
+
+#info .topspace {
+    margin-top: 20px;
 }
 
 #bottomline {

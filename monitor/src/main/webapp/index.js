@@ -1,8 +1,17 @@
 var services = angular.module('services', ['ngResource']);
 
 services.factory('stats', function($resource) {
-    return $resource('rest/stats/:cc', { cc: '@cc' }, {
+    return $resource('rest/stats', { cc: '@cc' }, {
         list: {
+            method: 'GET'
+        }
+    });
+});
+
+services.factory('tput', function($resource) {
+    return $resource('rest/stats/tput', { cc: '@cc' }, {
+        list: {
+            isArray: true,
             method: 'GET'
         }
     });
@@ -16,20 +25,25 @@ services.factory('user', function($resource) {
     });
 });
 
-var app = angular.module('MonitorApp', ['services']);
+var app = angular.module('MonitorApp', ['services', 'highcharts-ng']);
 
-app.directive('map', function() {
+app.directive('map', function($parse) {
     return {
         restrict: 'EAC',
         link: function(scope, element, attrs) {
             var map = $(element).vectorMap({
                 map: 'world_mill_en',
                 zoomButtons: false,
-                zoomOnScrollSpeed: 6,
+                zoomOnScroll: false,
                 series: {
                     regions: [{
                         scale: ['#8db6c0', '#57d9f6']
                     }]
+                },
+                onRegionClick: function (event, code) {
+                    var expressionHandler = $parse(attrs.ngClick);
+                    var map = $(event.currentTarget.parentElement).vectorMap('get', 'mapObject');
+                    expressionHandler(scope, {'code': code, 'name': map.getRegionName(code)});
                 }
             });
 
@@ -52,11 +66,69 @@ app.controller('UserCtrl', function($scope, user) {
 
 });
 
-app.controller('StatsCtrl', function($scope, $interval, $q, stats) {
+app.controller('StatsCtrl', function($scope, $interval, $q, stats, tput) {
 
-    $scope.refresh = function() {
-        stats.list({}, function(data) {
+    $scope.tputChart = {
+        title: { text: '' },
+        loading: false,
+        options: {
+            chart: {
+                type: 'area',
+                width: 290,
+                height: 150,
+                marginTop: 20,
+                marginLeft: 40,
+                marginRight: 0,
+                backgroundColor: 'transparent'
+            },
+            legend: { enabled: false },
+            plotOptions: {
+                area: {
+                    lineWidth: 1,
+                    lineColor: '#57D9F6',
+                    fillOpacity: '0.5',
+                    dataLabels: { enabled: false },
+                    marker: { enabled: false }
+                }
+            },
+            xAxis: {
+                type: 'datetime',
+                labels: {
+                    style: { color: 'lightgray' }
+                }
+            },
+            yAxis: {
+                gridLineColor: 'gray',
+                label: { enabled: false },
+                labels: {
+                    style: { color: 'lightgray' }
+                },
+                title: { enabled: false }
+            }
+        },
+        series: [{
+            name: 'Throughput [hour]',
+            data: []
+        }]
+    },
+
+    $scope.countrySelected = function(code, name) {
+        if (code) {
+            $scope.countryCode = code;
+            $scope.countryName = name;
+            $scope.refresh(code, name);
+        }
+    },
+
+    $scope.refresh = function(code) {
+        stats.list({cc: code}, function(data) {
             $scope.stats = data;
+        });
+        tput.list({cc: code}, function(data) {
+            $scope.tputChart.series[0].data = [];
+            angular.forEach(data, function(value) {
+               $scope.tputChart.series[0].data.push([value[0], value[1]]);
+            });
         });
     };
 

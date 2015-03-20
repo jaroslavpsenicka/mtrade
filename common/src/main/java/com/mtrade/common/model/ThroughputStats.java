@@ -14,9 +14,6 @@ public class ThroughputStats {
     private String countryCode;
 
     @NotNull
-    private StatsType type;
-
-    @NotNull
     private Date createDate;
 
     private float count;
@@ -24,9 +21,15 @@ public class ThroughputStats {
     public ThroughputStats() {
     }
 
-    public ThroughputStats(String countryCode, StatsType type) {
+    public ThroughputStats(String countryCode, Date createDate) {
         this.countryCode = countryCode;
-        this.type = type;
+        this.createDate = createDate;
+    }
+
+    public ThroughputStats(String countryCode, Date createDate, float count) {
+        this.countryCode = countryCode;
+        this.createDate = createDate;
+        this.count = count;
     }
 
     public String getId() {
@@ -39,14 +42,6 @@ public class ThroughputStats {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
-    }
-
-    public StatsType getType() {
-        return type;
-    }
-
-    public void setType(StatsType type) {
-        this.type = type;
     }
 
     public float getCount() {
