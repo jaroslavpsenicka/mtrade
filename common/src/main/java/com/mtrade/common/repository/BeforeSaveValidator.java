@@ -30,7 +30,7 @@ public class BeforeSaveValidator extends AbstractMongoEventListener {
     public void onBeforeSave(Object source, DBObject dbo) {
         Set<ConstraintViolation<Object>> violations = validator.validate(source);
         if (violations.size() > 0) {
-            LOG.info("Contraints violated: "  + violations);
+            LOG.info("Constraints violated: "  + violations);
             throw new ConstraintViolationException(violations);
         }
     }

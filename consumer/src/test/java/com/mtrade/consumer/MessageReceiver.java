@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class MessageReceiver {
 
-    private BlockingQueue<Message> receivedMessages = new ArrayBlockingQueue<Message>(2);
+    private BlockingQueue<Message> receivedMessages = new ArrayBlockingQueue<>(2);
 
     public void receive(Message message) throws InterruptedException {
         receivedMessages.put(message);

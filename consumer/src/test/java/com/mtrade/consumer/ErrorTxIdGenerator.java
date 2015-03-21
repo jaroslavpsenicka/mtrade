@@ -1,7 +1,5 @@
 package com.mtrade.consumer;
 
-import java.util.UUID;
-
 /**
  * @author jaroslav.psenicka@gmail.com
  */

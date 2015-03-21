@@ -31,11 +31,9 @@ public class UserDetailServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User user;
-
     @Before
     public void before() {
-        user = userRepository.save(new User("usr1"));
+        userRepository.save(new User("usr1"));
     }
 
     @After

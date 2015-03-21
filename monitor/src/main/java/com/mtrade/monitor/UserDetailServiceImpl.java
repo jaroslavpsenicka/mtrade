@@ -76,7 +76,7 @@ public class UserDetailServiceImpl implements UserDetailsService, InitializingBe
 			this.userName = user.getName();
             this.displayName = user.getDisplayName();
 			this.password = user.getPassword();
-			this.roles = new ArrayList<SimpleGrantedAuthority>();
+			this.roles = new ArrayList<>();
 			if (user.getRoles() != null) for (String role : user.getRoles()) {
 				roles.add(new SimpleGrantedAuthority(role));
 			}
