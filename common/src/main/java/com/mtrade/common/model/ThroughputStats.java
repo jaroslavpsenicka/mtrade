@@ -40,10 +40,6 @@ public class ThroughputStats {
         return countryCode;
     }
 
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
-
     public float getCount() {
         return count;
     }
@@ -56,7 +52,4 @@ public class ThroughputStats {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
 }

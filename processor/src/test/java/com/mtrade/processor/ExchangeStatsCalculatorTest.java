@@ -84,6 +84,7 @@ public class ExchangeStatsCalculatorTest {
         ExchangeStats exchangeStats = stats.get(0);
         assertEquals("CZK", exchangeStats.getCurrencyFrom());
         assertEquals("EUR", exchangeStats.getCurrencyTo());
+        assertEquals("CZ", exchangeStats.getOriginatingCountry());
         assertEquals(new Integer(2), exchangeStats.getCount());
         assertEquals(81, exchangeStats.getAmount(), 0.1);
     }
@@ -109,11 +110,13 @@ public class ExchangeStatsCalculatorTest {
         ExchangeStats rec = stats.get(0);
         assertEquals("CZK", rec.getCurrencyFrom());
         assertEquals("EUR", rec.getCurrencyTo());
+        assertEquals("CZ", rec.getOriginatingCountry());
         assertEquals(new Integer(2), rec.getCount());
         assertEquals(81, rec.getAmount(), 0.1);
         rec = stats.get(1);
         assertEquals("EUR", rec.getCurrencyFrom());
         assertEquals("CZK", rec.getCurrencyTo());
+        assertEquals("CZ", rec.getOriginatingCountry());
         assertEquals(new Integer(1), rec.getCount());
         assertEquals(1, rec.getAmount(), 0.1);
     }

@@ -17,5 +17,8 @@ public interface ExchangeStatsRepository extends MongoRepository<ExchangeStats, 
     @Query("{}")
     @Cacheable("exchange-stats")
     List<ExchangeStats> find(Pageable pageable);
+
+    @Cacheable("exchange-stats")
+    List<ExchangeStats> findByOriginatingCountry(String countryCode, Pageable pageRequest);
 }
 

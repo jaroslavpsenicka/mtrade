@@ -74,8 +74,8 @@ public class StatsCalculator {
     }
 
     private Iterable<ExchangeStats> getExchangeStats(Date createDate) {
-        AggregationOperation group = Aggregation.group("currencyFrom", "currencyTo").count().as("count")
-            .sum("amountSell").as("amount");
+        AggregationOperation group = Aggregation.group("originatingCountry", "currencyFrom", "currencyTo")
+            .count().as("count").sum("amountSell").as("amount");
         AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
         AggregationOperation limit = Aggregation.limit(5);
         Aggregation agg = Aggregation.newAggregation(group, sort, limit);

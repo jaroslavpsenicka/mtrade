@@ -14,6 +14,9 @@ public class ExchangeStats {
     private String id;
 
     @NotNull
+    private String originatingCountry;
+
+    @NotNull
     private String currencyFrom;
 
     @NotNull
@@ -35,8 +38,12 @@ public class ExchangeStats {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getOriginatingCountry() {
+        return originatingCountry;
+    }
+
+    public void setOriginatingCountry(String originatingCountry) {
+        this.originatingCountry = originatingCountry;
     }
 
     public String getCurrencyFrom() {

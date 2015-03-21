@@ -95,6 +95,7 @@ public class StatsControllerTest {
             .andExpect(jsonPath("tput.CZ", is(1.0)))
             .andExpect(jsonPath("tput.DE", is(3.0)))
             .andExpect(jsonPath("xchg", hasSize(1)))
+            .andExpect(jsonPath("xchg[0].originatingCountry", is("CZ")))
             .andExpect(jsonPath("xchg[0].currencyFrom", is("CZK")))
             .andExpect(jsonPath("xchg[0].currencyTo", is("EUR")))
             .andExpect(jsonPath("xchg[0].amount", is(12.0)))
@@ -118,6 +119,7 @@ public class StatsControllerTest {
         mockMvc.perform(get("/stats?cc=CZ"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("xchg[0].originatingCountry", is("CZ")))
             .andExpect(jsonPath("tput.CZ", is(1.0)));
     }
 
@@ -175,6 +177,7 @@ public class StatsControllerTest {
     private ExchangeStats createExchangeStats(String from, String to, float amount) {
         ExchangeStats stats = new ExchangeStats();
         stats.setCreateDate(new Date(timeConstant++));
+        stats.setOriginatingCountry("CZ");
         stats.setCurrencyFrom(from);
         stats.setCurrencyTo(to);
         stats.setAmount(amount);

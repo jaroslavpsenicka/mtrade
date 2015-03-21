@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +40,9 @@ public class StatsController {
     @RequestMapping(value="/stats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public StatsResponse getStats(@RequestParam(value = "cc", required = false) String countryCode) {
         PageRequest pageRequest = new PageRequest(0, 5, Sort.Direction.DESC, "createDate", "count");
-        return new StatsResponse(tputStatsRepository.actualStats(countryCode), xchgStatsRepository.find(pageRequest));
+        List<ExchangeStats> exchangeStats = StringUtils.isEmpty(countryCode) ? xchgStatsRepository.find(pageRequest)
+            : xchgStatsRepository.findByOriginatingCountry(countryCode, pageRequest);
+        return new StatsResponse(tputStatsRepository.actualStats(countryCode), exchangeStats);
     }
 
     @ResponseBody
