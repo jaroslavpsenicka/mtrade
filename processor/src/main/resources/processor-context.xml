@@ -43,16 +43,16 @@
     </bean>
 
     <task:annotation-driven />
-    <task:executor id="requestWriterExecutor" pool-size="2" />
+    <task:executor id="requestWriterExecutor" pool-size="10" />
 
     <bean id="statsCalculator" class="com.mtrade.processor.StatsCalculator"/>
 
-    <task:scheduler id="statsScheduler" pool-size="10"/>
+    <task:scheduler id="statsScheduler" pool-size="1"/>
     <task:scheduled-tasks scheduler="statsScheduler">
-        <task:scheduled ref="statsCalculator" method="calculateStats" cron="0 0 * * * *"/>
+        <task:scheduled ref="statsCalculator" method="calculateStats" cron="0 * * * * *"/>
     </task:scheduled-tasks>
 
-    <mongo:repositories base-package="com.mtrade.common.repository, com.mtrade.processor.repository"/>
+    <mongo:repositories base-package="com.mtrade.common.repository"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongo" ref="mongo"/>
@@ -65,7 +65,7 @@
 
     <int-kafka:inbound-channel-adapter id="inboundChannelAdapter" kafka-consumer-context-ref="consumerContext"
         channel="requests" auto-startup="true">
-        <int:poller fixed-rate="500" time-unit="MILLISECONDS" />
+        <int:poller fixed-rate="200" time-unit="MILLISECONDS"/>
     </int-kafka:inbound-channel-adapter>
 
     <int:channel id="requests">
@@ -74,7 +74,7 @@
 
     <bean id="requestWriter" class="com.mtrade.processor.RequestWriter" />
     <int:outbound-channel-adapter channel="requests" ref="requestWriter" method="write">
-        <int:poller fixed-rate="500" task-executor="requestWriterExecutor"/>
+        <int:poller fixed-rate="200" task-executor="requestWriterExecutor"/>
     </int:outbound-channel-adapter>
 
 </beans>

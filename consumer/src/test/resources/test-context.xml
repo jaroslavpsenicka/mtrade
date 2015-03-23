@@ -11,8 +11,6 @@
     http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka-1.0.xsd
     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <int:outbound-channel-adapter id="outboundChannelAdapter" channel="requests" ref="messageReceiver" method="receive">
-        <int:poller task-executor="requestsUnloader" fixed-delay="100"/>
-    </int:outbound-channel-adapter>
+    <int:outbound-channel-adapter id="outboundChannelAdapter" channel="requests" ref="messageReceiver" method="receive"/>
 
 </beans>

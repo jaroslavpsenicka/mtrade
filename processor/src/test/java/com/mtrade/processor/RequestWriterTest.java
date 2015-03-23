@@ -38,7 +38,7 @@ public class RequestWriterTest {
     public void before() throws IOException {
         req1 = new TradeRequest();
         req1.setUserId("user");
-        req1.setTransactionId("tx");
+        req1.setTransactionId("tx1");
         req1.setAmountBuy((float) 1);
         req1.setAmountSell((float) 27);
         req1.setCurrencyFrom("CZK");
@@ -48,7 +48,7 @@ public class RequestWriterTest {
         req1.setTimePlaced(new Date(0));
         req2 = new TradeRequest();
         req2.setUserId("user");
-        req2.setTransactionId("tx");
+        req2.setTransactionId("tx2");
         req2.setAmountBuy((float) 2);
         req2.setAmountSell((float) 54);
         req2.setCurrencyFrom("CZK");

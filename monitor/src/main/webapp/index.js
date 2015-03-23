@@ -143,9 +143,9 @@ app.controller('JmxCtrl', function($scope, $interval, $q, stats, tput) {
 
     $scope.jmx = new Jolokia("jmx");
     $scope.req = [
-        { type: "read", mbean: "java.lang:type=OperatingSystem", attribute: "SystemCpuLoad"},
-        { type: "read", mbean: "kafka.server:type=BrokerTopicMetrics", attribute: "BytesInPerSec"},
-        { type: "read", mbean: "kafka.server:type=BrokerTopicMetrics", attribute: "BytesOutPerSec"}
+        { type: 'read', mbean: 'java.lang:type=OperatingSystem', attribute: 'SystemCpuLoad' },
+        { type: 'read', mbean: 'kafka.server:name=BytesInPerSec,topic=REQS,type=BrokerTopicMetrics', attribute:'OneMinuteRate' },
+        { type: 'read', mbean: 'kafka.server:name=BytesOutPerSec,topic=REQS,type=BrokerTopicMetrics', attribute:'OneMinuteRate' }
     ];
 
     $scope.loadChart = {
@@ -242,16 +242,22 @@ app.controller('JmxCtrl', function($scope, $interval, $q, stats, tput) {
         $scope.refreshTopicChart(resp[1], resp[2]);
     };
 
-    $scope.refreshLoadChart = function(value) {
-        var serie = $scope.loadChart.getHighcharts().series[0];
-        serie.addPoint({x: value.timestamp * 1000, y: ((value.value * 1000) / 10)}, true, serie.data.length >= 60);
+    $scope.refreshLoadChart = function(load) {
+        if (load && load.status == 200) {
+            var serie = $scope.loadChart.getHighcharts().series[0];
+            serie.addPoint({x: load.timestamp * 1000, y: ((load.value * 1000) / 10)}, true, serie.data.length >= 60);
+        }
     }
 
     $scope.refreshTopicChart = function(intake, exhaust) {
-        var serie1 = $scope.topicChart.getHighcharts().series[0];
-        serie1.addPoint({x: intake.timestamp * 1000, y: intake.value.used}, true, serie1.data.length >= 200);
-        serie2 = $scope.topicChart.getHighcharts().series[1];
-        serie2.addPoint({x: exhaust.timestamp * 1000, y: exhaust.value.used}, true, serie2.data.length >= 200);
+        if (intake && intake.status == 200) {
+            var serie = $scope.topicChart.getHighcharts().series[0];
+            serie.addPoint({x: intake.timestamp * 1000, y: intake.value}, true, serie.data.length >= 200);
+        }
+        if (exhaust && exhaust.status == 200) {
+            var serie = $scope.topicChart.getHighcharts().series[1];
+            serie.addPoint({x: exhaust.timestamp * 1000, y: exhaust.value}, true, serie.data.length >= 200);
+        }
     }
 
     setInterval(function() {

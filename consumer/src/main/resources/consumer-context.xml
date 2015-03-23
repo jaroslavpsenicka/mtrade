@@ -23,9 +23,7 @@
     <int:gateway id="requestsGW" service-interface="com.mtrade.consumer.RequestProcessorGateway"
          default-request-channel="requests"/>
 
-    <int:channel id="requests">
-        <int:queue capacity="1000"/>
-    </int:channel>
+    <int:channel id="requests"/>
 
     <bean id="stringEncoder" class="org.springframework.integration.kafka.serializer.common.StringEncoder"/>
     <bean id="kryoCodecPrototype" class="com.mtrade.common.serializer.KryoCodec" scope="prototype" lazy-init="true"/>
@@ -48,10 +46,8 @@
         </int-kafka:producer-configurations>
     </int-kafka:producer-context>
 
-    <task:executor id="requestsUnloader" pool-size="2" />
     <int-kafka:outbound-channel-adapter id="outboundChannelAdapter" kafka-producer-context-ref="producerContext"
         auto-startup="true" channel="requests" topic="REQS">
-        <int:poller task-executor="requestsUnloader" fixed-rate="500"/>
     </int-kafka:outbound-channel-adapter>
 
 </beans>

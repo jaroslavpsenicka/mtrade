@@ -21,9 +21,9 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1000</stringProp>
+          <stringProp name="LoopController.loops">100</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">3</stringProp>
+        <stringProp name="ThreadGroup.num_threads">2</stringProp>
         <stringProp name="ThreadGroup.ramp_time">5</stringProp>
         <longProp name="ThreadGroup.start_time">1426369439000</longProp>
         <longProp name="ThreadGroup.end_time">1426369439000</longProp>
@@ -40,7 +40,7 @@
 import java.util.Locale;
 
 String[] CURR = new String[] {&quot;CZK&quot;, &quot;EUR&quot;, &quot;GBP&quot;, &quot;USD&quot;, &quot;JPY&quot;};
-String[] STATES = new String[] {&quot;CZ&quot;, &quot;DE&quot;, &quot;PL&quot;, &quot;IE&quot;, &quot;GB&quot;, &quot;US&quot;, &quot;JP&quot;, &quot;IS&quot; &quot;DK&quot;, &quot;NL&quot;};
+String[] STATES = new String[] {&quot;CZ&quot;, &quot;DE&quot;, &quot;PL&quot;, &quot;IE&quot;, &quot;GB&quot;, &quot;US&quot;, &quot;JP&quot;, &quot;IS&quot;, &quot;DK&quot;, &quot;NL&quot;};
 
 Random random = new Random();
 Integer userId = random.nextInt(10000);
@@ -54,8 +54,18 @@ SimpleDateFormat sdf = new SimpleDateFormat(&quot;dd-MMM-yy hh:mm:ss&quot;, Loca
 String country = STATES[random.nextInt(STATES.length)];
 
 vars.put(&quot;json&quot;, &quot;{\&quot;userId\&quot;: \&quot;&quot;+userId+&quot;\&quot;, \&quot;currencyFrom\&quot;: \&quot;&quot;+currencyFrom+&quot;\&quot;, \&quot;currencyTo\&quot;: \&quot;&quot;+currencyTo+&quot;\&quot;, \&quot;amountSell\&quot;: &quot;+amountSell+&quot;, \&quot;amountBuy\&quot;: &quot;+amountBuy+&quot;, \&quot;rate\&quot;: &quot;+rate+&quot;, \&quot;timePlaced\&quot; : \&quot;&quot;+sdf.format(timePlaced)+&quot;\&quot;, \&quot;originatingCountry\&quot; : \&quot;&quot;+country+&quot;\&quot;}&quot;);
+log(vars);
 </stringProp>
         </BeanShellPreProcessor>
+        <hashTree/>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/json</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
         <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -68,8 +78,8 @@ vars.put(&quot;json&quot;, &quot;{\&quot;userId\&quot;: \&quot;&quot;+userId+&qu
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.domain">104.155.51.247</stringProp>
+          <stringProp name="HTTPSampler.port">80</stringProp>
           <stringProp name="HTTPSampler.connect_timeout"></stringProp>
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
