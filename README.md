@@ -278,11 +278,10 @@ The activity shows computation of statistics triggered on regular basis.
 
 ### Display Results
 
-The activity shows monitor module accessing data. 
+The monitor web application uses several REST endpoints to access data; there are two refresh timers configured
 
-<p align="center">
-   <img src="doc/display-results.png">
-</p>
+* slow timer is refreshing throughput and currency data every minute,
+* fast timer is refreshing JMX data every 2 seconds.
 
 ## Quality
 
@@ -330,12 +329,10 @@ The whole solution has been designed with extra focus on scalability. All compon
 
 * **Consumer** -- the component is deployed into servlet container, there may be multiple containers in use being controlled by the Apache proxy. All instances can post messages into the same Kafka topic.
 * **Kafka** -- the messaging topic can be split into partitions, default implementation of Kafka client uses round-robin partition strategy; a large number of messages can be spread into multiple channels (partitions) and processed concurrently.
-* **Processor** -- there should be as many instances of the processor component as partitions; the existing implementation (standalone application) may not be ideal for operations, some kind of cluster management such as Hadoop YARN or similar. It is generally recommended to install one processor module per VM.
+* **Processor** -- there should be as many instances of the processor component as partitions; the existing implementation (standalone application) may not be ideal for operations, some kind of cluster management such as Hadoop YARN or similar may provide better control. It is generally recommended to install one processor module per VM.
 * **MongoDB** -- there may be one or more replicas created, however there may be only one cluster node used for writing - the statistics calculations performed by the processor module could be directed to a read-only replica. 
 
 There are several fine knobs that can be used in processor module:
 
-* There is a **requests queue channel** defined holding incoming messages from Kafka topic before they are written into database; increasing the queue size may improve the performance if there is slow database connection vs fast connection to the messaging system; however, messages are read and processed in chunks. Increasing queue capacity may exhaust physical memory and cause disk swapping. Moreover, there is a **offset autocommit** feature in use, which may cause difficulties in combination with large queue; messages might get commited (marked processed) too early (while waiting in queue) and get lost during eventual system failure. To solve this, an explicit offset commit should be used.
 * There is a **thread pool** used to handle parallel dequeuing and writes into the database; the pool size should be kept aligned with the actual number of CPU cores to avoid excessive context switching.
-* There is a **throughput statistics** calculated every minute, this period may be tuned by setting the cron expression - shorter period may cause more often calculations, longer periods may lead to work with large datasets. Should be tuned based on business requirements and actual data volume.
-* The **messages collection** might be archived and truncated daily to avoid large dataset, data shown by monitor module are kept in separate collections.
+* There is a **throughput statistics** calculated every minute, this period may be tuned by setting the cron expression - shorter period may cause more often calculations, longer periods may lead to work with larger datasets. Should be tuned based on business requirements and actual data volume. A good index would help in all cases.
