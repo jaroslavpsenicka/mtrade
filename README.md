@@ -15,13 +15,13 @@ There is a [REST endpoint](http://104.155.51.247/consumer/request) exposed to en
    <img src="doc/screenshot.png">
 </p>
 
-The monitor application requires the user to authenticate:
+The application shows the world map with actual trading and right-column with detailed information of the trading history and most exchanged currencies. Click a region in map to show country-specific data. Additionally, there are two small charts on the bottom of the screen showing the actual CPU utilization and Kafka topic throughput (data in/out). The monitor application requires the user to authenticate:
 
 * username *admin*
 * password *pwd*
 
 ## Components
-There are several components realizing given functions:
+There are several components realizing these functions:
 
 <p align="center">
    <img src="doc/components.png">
@@ -112,7 +112,7 @@ Returns 400 BAD REQUEST and a JSON structure describing the error, for example:
 
 	{
     	"currencyFrom": "invalid currency code"
-    }
+        }
 
 ### User Service
 
@@ -161,13 +161,18 @@ Returns information about current exchange statistics by country (*tput* element
 
 	{
     	"tput": {
-        	"CZ": 8575,
+            "CZ": 8575,
             "GB": 9585,
             "FR": 94877
         },
-        "xchg": {
-        
-    	}
+        "xchg": [{
+            "originatingCountry": "DE",
+            "currencyFrom": "USD",
+            "currencyTo": "CZK",
+            "count": 90,
+            "amount": 5219.8306,
+            "createDate": 1427411760001
+        }]
     }
 
 #### Errors
@@ -176,7 +181,7 @@ Returns 400 BAD REQUEST and a JSON structure describing the error, for example:
 
 	{
     	"cc": "invalid country code"
-    }
+        }
 
 ### Throughput Service
 
@@ -196,16 +201,11 @@ There are following URL parameters:
 
 Returns information about current exchange statistics by country (*tput* element) and top-five of currencies by number of transactions (*xchg* element), for example:
 
-	{
-    	"tput": {
-        	"CZ": 8575,
-            "GB": 9585,
-            "FR": 94877
-        },
-        "xchg": {
-        
-    	}
-    }
+	[
+   	    [1427410920001, 362],
+    	    [1427411280001, 199],
+    	    ...
+    	]
 
 #### Errors
 
@@ -226,13 +226,27 @@ Corresponds to incoming request and is enriched with the following attributes:
 
 Stored in *requests* collection.
 
-### Statistics
-TODO
+### Throughput Statistics
+Stores throughput stats for given country and date in *throughputStats* collection.
 
-Stored in *throughputStats* collection.
-
+	{
+	    "countryCode" : "CA", 
+	    "createDate" : ISODate("2015-03-26T23:02:00.001Z"), 
+	    "count" : 0.00003228222340112552
+	}
+	
 ### Users
-Stores user accounts and corresponding roles.
+Stores user accounts and corresponding roles, password is SHA1 encrypted.
+
+	 {
+	     "name" : "admin", 
+	     "displayName" : "Default Admin", 
+	     "password" : "37fa265330ad83eaa879efb1e2db6380896cf639", 
+	     "createDate" : ISODate("2015-03-23T14:53:33.648Z"), 
+	     "roles" : [ 
+	     	"ADMIN" 
+	     ]
+	 }
 
 ## Processes
 
@@ -276,21 +290,17 @@ There were following quality attributes checked.
 
 ### Source Code
 
-TODO unit-tests
-
-### Performance 
-
-TODO perf test
+There is a set of unit tests implemented with a coverage exceeding 80%. 
 
 ### UAT
 
-TODO not implemented, could be
+There were no UAT tests implemented because of the character of the application. However, a decent set of Selenium tests could be implemented testing the page rendering and region click.
 
 ## Security
 There are two endpoints available: the REST endpoint where end-users issue their requests and the monitor web application.
 
 ### REST Endpoint
-The endpoint is exposed to end-users and should be well protected in terms of access control, usage quotas, DoS protection, transfer 
+The endpoint is exposed to end-users and should be well protected in terms of access control, usage quotas, DoS protection, SSL etc. The service should be managed by an API managemnt tool, such as Apigee or similar and does not makes much sense implementing a subset of the functionality locally.
 
 ## Deployment
 
@@ -301,7 +311,8 @@ The solution is deployed to Google Compute Engine, [n1-highmem-2](https://cloud.
 </p>
 
 ## Operational Support
-TODO JMX: tomcat, producer, kafka
+
+Operations should use JMX for monitoring, there is a good set of beans exposed on Apache Tomcat, Apache Kafka as well as on the producer module.
 
 ## Further Improvements
 
@@ -328,5 +339,3 @@ There are several fine knobs that can be used in processor module:
 * There is a **thread pool** used to handle parallel dequeuing and writes into the database; the pool size should be kept aligned with the actual number of CPU cores to avoid excessive context switching.
 * There is a **throughput statistics** calculated every minute, this period may be tuned by setting the cron expression - shorter period may cause more often calculations, longer periods may lead to work with large datasets. Should be tuned based on business requirements and actual data volume.
 * The **messages collection** might be archived and truncated daily to avoid large dataset, data shown by monitor module are kept in separate collections.
-
-### Integration Options
