@@ -23,7 +23,9 @@ The monitor application requires the user to authenticate:
 ## Components
 There are several components realizing given functions:
 
-TODO components.png
+<p style="text-align: center;">
+   <img src="doc/components.png">
+</p>
 
 * **Consumer** - a web application (packaging war) exposing a simple REST service; the service receives user requests, performs validation and send the request to the Kafka topic,
 * **Processor** - a standalone application (packaging jar) attached to a Kafka topic, saving data into the database; the application computes predefined statistics as well,
@@ -240,25 +242,33 @@ There are following activities implemented.
 
 The activity shows trade request being issued by the consumer and handled by the consumer module. The call is synchronous and all errors are propagated to the end-user in form of error response. Multi-threading is managed by the servlet container.
 
-TODO diagram
+<p style="text-align: center;">
+   <img src="doc/place-request.png">
+</p>
 
 ### Process Request
 
 The activity shows trade request being processed by the processor module and stored in the database. 
 
-TODO diagram
+<p style="text-align: center;">
+   <img src="doc/process-request.png">
+</p>
 
 ### Calculate Statistics
 
 The activity shows computation of statistics triggered on regular basis. 
 
-TODO diagram
+<p style="text-align: center;">
+   <img src="doc/calculate-statistics.png">
+</p>
 
 ### Display Results
 
 The activity shows monitor module accessing data. 
 
-TODO diagram
+<p style="text-align: center;">
+   <img src="doc/display-results.png">
+</p>
 
 ## Quality
 
@@ -286,7 +296,9 @@ The endpoint is exposed to end-users and should be well protected in terms of ac
 
 The solution is deployed to Google Compute Engine, [n1-highmem-2](https://cloud.google.com/compute/) type (2 cores, 13GB RAM) as follows:
 
-TODO deployment diagram
+<p style="text-align: center;">
+   <img src="doc/deployment.png">
+</p>
 
 ## Operational Support
 TODO JMX: tomcat, producer, kafka
