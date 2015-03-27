@@ -21,10 +21,10 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">100</stringProp>
+          <stringProp name="LoopController.loops">1000</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">2</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <longProp name="ThreadGroup.start_time">1426369439000</longProp>
         <longProp name="ThreadGroup.end_time">1426369439000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -40,7 +40,7 @@
 import java.util.Locale;
 
 String[] CURR = new String[] {&quot;CZK&quot;, &quot;EUR&quot;, &quot;GBP&quot;, &quot;USD&quot;, &quot;JPY&quot;};
-String[] STATES = new String[] {&quot;CZ&quot;, &quot;DE&quot;, &quot;PL&quot;, &quot;IE&quot;, &quot;GB&quot;, &quot;US&quot;, &quot;JP&quot;, &quot;IS&quot;, &quot;DK&quot;, &quot;NL&quot;};
+String[] STATES = new String[] {&quot;CN&quot;, &quot;DE&quot;, &quot;PL&quot;, &quot;CA&quot;, &quot;GB&quot;, &quot;US&quot;, &quot;BR&quot;, &quot;IS&quot;, &quot;RU&quot;, &quot;AU&quot;};
 
 Random random = new Random();
 Integer userId = random.nextInt(10000);
@@ -158,6 +158,10 @@ log(vars);
             </value>
           </objProp>
           <stringProp name="filename"></stringProp>
+          <stringProp name="RespTimeGraph.interval">20000</stringProp>
+          <intProp name="RespTimeGraph.linestrockwidth">0</intProp>
+          <intProp name="RespTimeGraph.lineshapepoint">4</intProp>
+          <stringProp name="RespTimeGraph.yaxisscalemaxvalue">100</stringProp>
         </ResultCollector>
         <hashTree/>
       </hashTree>

@@ -107,7 +107,7 @@ app.controller('StatsCtrl', function($scope, $interval, $q, stats, tput) {
             }
         },
         series: [{
-            name: 'Throughput [hour]',
+            name: 'Trading [min]',
             data: []
         }]
     },
@@ -135,7 +135,7 @@ app.controller('StatsCtrl', function($scope, $interval, $q, stats, tput) {
     $scope.refresh();
     setInterval(function() {
         $scope.refresh();
-    }, 900000);
+    }, 60000);
 
 });
 

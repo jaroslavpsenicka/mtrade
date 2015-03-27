@@ -23,9 +23,16 @@ public class RequestWriter {
     public void write(Map<String, Map<Integer, List<TradeRequest>>> requests) {
         for (Map<Integer, List<TradeRequest>> map : requests.values()) {
             for (List<TradeRequest> objects : map.values()) {
-                repository.save(objects);
+                long diff = write(objects);
+                LOG.info(Thread.currentThread().getName() + ": " + objects.size() + " objects saved in " + diff + "ms");
             }
         }
+    }
+
+    private long write(List<TradeRequest> objects) {
+        long startTime = System.currentTimeMillis();
+        repository.save(objects);
+        return System.currentTimeMillis() - startTime;
     }
 
 }

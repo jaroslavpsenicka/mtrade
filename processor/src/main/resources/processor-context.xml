@@ -23,7 +23,8 @@
 
     <int-kafka:consumer-context id="consumerContext" zookeeper-connect="zookeeper">
         <int-kafka:consumer-configurations>
-            <int-kafka:consumer-configuration group-id="processors" value-decoder="kryoCodec" key-decoder="stringDecoder">
+            <int-kafka:consumer-configuration group-id="processors" max-messages="250"
+                value-decoder="kryoCodec" key-decoder="stringDecoder">
                 <int-kafka:topic id="REQS" streams="1" />
             </int-kafka:consumer-configuration>
         </int-kafka:consumer-configurations>
@@ -43,7 +44,7 @@
     </bean>
 
     <task:annotation-driven />
-    <task:executor id="requestWriterExecutor" pool-size="10" />
+    <task:executor id="requestWriterExecutor" pool-size="0-10" />
 
     <bean id="statsCalculator" class="com.mtrade.processor.StatsCalculator"/>
 
@@ -69,12 +70,10 @@
     </int-kafka:inbound-channel-adapter>
 
     <int:channel id="requests">
-        <int:queue capacity="2000"/>
+        <int:dispatcher task-executor="requestWriterExecutor"/>
     </int:channel>
 
     <bean id="requestWriter" class="com.mtrade.processor.RequestWriter" />
-    <int:outbound-channel-adapter channel="requests" ref="requestWriter" method="write">
-        <int:poller fixed-rate="200" task-executor="requestWriterExecutor"/>
-    </int:outbound-channel-adapter>
+    <int:outbound-channel-adapter channel="requests" ref="requestWriter" method="write"/>
 
 </beans>

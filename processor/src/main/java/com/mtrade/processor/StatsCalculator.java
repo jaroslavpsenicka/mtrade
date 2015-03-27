@@ -35,7 +35,13 @@ public class StatsCalculator {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    private long period = 60000L;
+
     private static final Logger LOG = LoggerFactory.getLogger(StatsCalculator.class);
+
+    public void setPeriod(long period) {
+        this.period = period;
+    }
 
     public void calculateStats() {
         LOG.info("Calculating stats");
@@ -56,15 +62,15 @@ public class StatsCalculator {
         AggregationResults<ThroughputStats> results = this.mongoTemplate.aggregate(agg,
             TradeRequest.class, ThroughputStats.class);
 
-        List<ThroughputStats> hourlyStats = new ArrayList<>();
-        long period = (createDate.getTime() - lastSuccessDate.getTime()) / 3600000;
+        List<ThroughputStats> stats = new ArrayList<>();
+        float relativePeriod = (createDate.getTime() - lastSuccessDate.getTime()) / this.period;
         for (ThroughputStats result : results.getMappedResults()) {
             ThroughputStats countryStats = new ThroughputStats(result.getId(), createDate);
-            countryStats.setCount(result.getCount() / period);
-            hourlyStats.add(countryStats);
+            countryStats.setCount(result.getCount() / (relativePeriod > 0 ? relativePeriod : 1));
+            stats.add(countryStats);
         }
 
-        return hourlyStats;
+        return stats;
     }
 
     private Date readLastSuccessDate() {
