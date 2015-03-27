@@ -11,7 +11,9 @@ The solution consists of a several modules realizing the following set of functi
 ## User Interface
 There is a [REST endpoint](http://104.155.51.247/consumer/request) exposed to end-users consuming JSON requests (please refer to [service description](#ConsumerService) for further reference) and [web user interface](http://104.155.51.247/monitor/) for business/application monitoring.
 
-TODO screenshot
+<p style="text-align: center;">
+   <img src="doc/screenshot.png">
+</p>
 
 The monitor application requires the user to authenticate:
 
