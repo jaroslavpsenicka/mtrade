@@ -11,7 +11,7 @@ The solution consists of a several modules realizing the following set of functi
 ## User Interface
 There is a [REST endpoint](http://104.155.51.247/consumer/request) exposed to end-users consuming JSON requests (please refer to [service description](#ConsumerService) for further reference) and [web user interface](http://104.155.51.247/monitor/) for business/application monitoring.
 
-<p style="text-align: center;">
+<p align="center">
    <img src="doc/screenshot.png">
 </p>
 
@@ -23,7 +23,7 @@ The monitor application requires the user to authenticate:
 ## Components
 There are several components realizing given functions:
 
-<p style="text-align: center;">
+<p align="center">
    <img src="doc/components.png">
 </p>
 
@@ -242,7 +242,7 @@ There are following activities implemented.
 
 The activity shows trade request being issued by the consumer and handled by the consumer module. The call is synchronous and all errors are propagated to the end-user in form of error response. Multi-threading is managed by the servlet container.
 
-<p style="text-align: center;">
+<p align="center">
    <img src="doc/place-request.png">
 </p>
 
@@ -250,7 +250,7 @@ The activity shows trade request being issued by the consumer and handled by the
 
 The activity shows trade request being processed by the processor module and stored in the database. 
 
-<p style="text-align: center;">
+<p align="center">
    <img src="doc/process-request.png">
 </p>
 
@@ -258,7 +258,7 @@ The activity shows trade request being processed by the processor module and sto
 
 The activity shows computation of statistics triggered on regular basis. 
 
-<p style="text-align: center;">
+<p align="center">
    <img src="doc/calculate-statistics.png">
 </p>
 
@@ -266,7 +266,7 @@ The activity shows computation of statistics triggered on regular basis.
 
 The activity shows monitor module accessing data. 
 
-<p style="text-align: center;">
+<p align="center">
    <img src="doc/display-results.png">
 </p>
 
@@ -296,7 +296,7 @@ The endpoint is exposed to end-users and should be well protected in terms of ac
 
 The solution is deployed to Google Compute Engine, [n1-highmem-2](https://cloud.google.com/compute/) type (2 cores, 13GB RAM) as follows:
 
-<p style="text-align: center;">
+<p align="center">
    <img src="doc/deployment.png">
 </p>
 
