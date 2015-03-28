@@ -404,4 +404,6 @@ Should be tuned based on business requirements and actual data volume. A good in
 
 ## Known Issues
 
-There were several issues related to Kafka monitoring (JMX) service availability.  
+* There were several issues related to Kafka monitoring (JMX) service availability caused by lost connection between 
+Zookeeper and Kafka, no further details, restart of both systems solved the issue.
+* Highlighted map regions may not be very contrast, the color scheme may need update depending on production experience.
