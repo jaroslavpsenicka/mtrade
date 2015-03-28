@@ -11,7 +11,7 @@ The solution consists of a several modules realizing the following set of functi
 
 ## User Interface
 There is a [REST endpoint](http://104.155.51.247/consumer/request) exposed to end-users consuming JSON requests (please 
-refer to [service description](#ConsumerService) for further reference) and 
+refer to [service description](#consumer-service) for further reference) and 
 [web user interface](http://104.155.51.247/monitor/) for business/application monitoring.
 
 <p align="center">
@@ -25,6 +25,9 @@ monitor application requires the user to authenticate:
 
 * username *admin*
 * password *pwd*
+
+:warning: The application runs within a test/free mode of Google Cloud Service and may not be available after 1st of May.
+There might be a service outage in case of [service mintenance](https://cloud.google.com/compute/docs/faq#maintenance).
 
 ## Components
 There are several components realizing these functions:
