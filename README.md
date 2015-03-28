@@ -26,11 +26,8 @@ monitor application requires the user to authenticate:
 * username *admin*
 * password *pwd*
 
-<div style="background-color: lightred;">
-:warning:
-<span style="margin-left: 50px;">The application runs within a test/free mode of Google Cloud Service and may not be available after 1st of May.
-There might be a service outage in case of the [hosting service mintenance](https://cloud.google.com/compute/docs/faq#maintenance).</span>
-</div>
+:warning: The application runs within a test/free mode of Google Cloud Service and may not be available after 1st of May.
+There might be a service outage in case of the [hosting service mintenance](https://cloud.google.com/compute/docs/faq#maintenance).
 
 ## Components
 There are several components realizing these functions:
