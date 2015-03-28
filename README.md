@@ -26,8 +26,11 @@ monitor application requires the user to authenticate:
 * username *admin*
 * password *pwd*
 
-:warning: The application runs within a test/free mode of Google Cloud Service and may not be available after 1st of May.
-There might be a service outage in case of [service mintenance](https://cloud.google.com/compute/docs/faq#maintenance).
+<div style="background-color: lightred;">
+:warning:
+<span style="margin-left: 50px;">The application runs within a test/free mode of Google Cloud Service and may not be available after 1st of May.
+There might be a service outage in case of the [hosting service mintenance](https://cloud.google.com/compute/docs/faq#maintenance).</span>
+</div>
 
 ## Components
 There are several components realizing these functions:
@@ -401,3 +404,7 @@ chunks of data to be written.
 * There is a **throughput statistics** calculated every minute, this period may be tuned by setting the cron 
 expression - shorter period may cause more often calculations, longer periods may lead to work with larger datasets. 
 Should be tuned based on business requirements and actual data volume. A good index would help in all cases.
+
+## Known Issues
+
+There were several issues related to Kafka monitoring (JMX) service availability.  
