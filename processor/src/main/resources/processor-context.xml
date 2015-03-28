@@ -1,6 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:p="http://www.springframework.org/schema/p"
    xmlns:task="http://www.springframework.org/schema/task"
    xmlns:mongo="http://www.springframework.org/schema/data/mongo"
    xmlns:int="http://www.springframework.org/schema/integration"
@@ -15,7 +16,7 @@
 
     <context:annotation-config />
     <context:component-scan base-package="com.mtrade.common, com.mtrade.processor" />
-    <context:property-placeholder location="classpath:/mongodb.properties"/>
+    <context:property-placeholder location="classpath:/mongodb.properties, classpath:/application.properties"/>
 
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
@@ -46,7 +47,8 @@
     <task:annotation-driven />
     <task:executor id="requestWriterExecutor" pool-size="0-10" />
 
-    <bean id="statsCalculator" class="com.mtrade.processor.StatsCalculator"/>
+    <bean id="statsCalculator" class="com.mtrade.processor.StatsCalculator"
+        p:period="60000" p:enabled="${run-stats}"/>
 
     <task:scheduler id="statsScheduler" pool-size="1"/>
     <task:scheduled-tasks scheduler="statsScheduler">
@@ -73,7 +75,7 @@
         <int:dispatcher task-executor="requestWriterExecutor"/>
     </int:channel>
 
-    <bean id="requestWriter" class="com.mtrade.processor.RequestWriter" />
+    <bean id="requestWriter" class="com.mtrade.processor.RequestWriter"/>
     <int:outbound-channel-adapter channel="requests" ref="requestWriter" method="write"/>
 
 </beans>

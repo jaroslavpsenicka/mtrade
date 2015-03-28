@@ -48,7 +48,13 @@ app.directive('map', function($parse) {
             });
 
             scope.$watch("stats" , function(value) {
-                map.vectorMap('get', 'mapObject').series.regions[0].setValues(value ? value.tput : undefined);
+                if (value) {
+                    var region = map.vectorMap('get', 'mapObject').series.regions[0];
+                    var values = $.map(value.tput, function(value){return value});
+                    region.params.min = Math.round(Math.min.apply(null, values));
+                    region.params.max = Math.round(Math.max.apply(null, values));
+                    region.setValues(value.tput);
+                }
             });
         }
     }
@@ -144,8 +150,8 @@ app.controller('JmxCtrl', function($scope, $interval, $q, stats, tput) {
     $scope.jmx = new Jolokia("jmx");
     $scope.req = [
         { type: 'read', mbean: 'java.lang:type=OperatingSystem', attribute: 'SystemCpuLoad' },
-        { type: 'read', mbean: 'kafka.server:name=BytesInPerSec,topic=REQS,type=BrokerTopicMetrics', attribute:'OneMinuteRate' },
-        { type: 'read', mbean: 'kafka.server:name=BytesOutPerSec,topic=REQS,type=BrokerTopicMetrics', attribute:'OneMinuteRate' }
+        { type: 'read', mbean: 'kafka.server:name=BytesInPerSec,type=BrokerTopicMetrics', attribute:'OneMinuteRate' },
+        { type: 'read', mbean: 'kafka.server:name=BytesInPerSec,type=BrokerTopicMetrics', attribute:'OneMinuteRate' }
     ];
 
     $scope.loadChart = {

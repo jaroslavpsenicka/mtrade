@@ -36,6 +36,7 @@ public class StatsCalculator {
     private MongoTemplate mongoTemplate;
 
     private long period = 60000L;
+    private boolean enabled = true;
 
     private static final Logger LOG = LoggerFactory.getLogger(StatsCalculator.class);
 
@@ -43,14 +44,20 @@ public class StatsCalculator {
         this.period = period;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public void calculateStats() {
-        LOG.info("Calculating stats");
-        Date createDate = new Date();
-        try {
-            throughputStatsRepository.save(getThroughputStats(createDate));
-            exchangeStatsRepository.save(getExchangeStats(createDate));
-        } catch (Exception ex) {
-            LOG.error("Error calculating stats", ex);
+        if (enabled) {
+            LOG.info("Calculating stats");
+            Date createDate = new Date();
+            try {
+                throughputStatsRepository.save(getThroughputStats(createDate));
+                exchangeStatsRepository.save(getExchangeStats(createDate));
+            } catch (Exception ex) {
+                LOG.error("Error calculating stats", ex);
+            }
         }
     }
 
@@ -83,8 +90,7 @@ public class StatsCalculator {
         AggregationOperation group = Aggregation.group("originatingCountry", "currencyFrom", "currencyTo")
             .count().as("count").sum("amountSell").as("amount");
         AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
-        AggregationOperation limit = Aggregation.limit(5);
-        Aggregation agg = Aggregation.newAggregation(group, sort, limit);
+        Aggregation agg = Aggregation.newAggregation(group, sort);
         AggregationResults<ExchangeStats> results = this.mongoTemplate.aggregate(agg,
             TradeRequest.class, ExchangeStats.class);
 
