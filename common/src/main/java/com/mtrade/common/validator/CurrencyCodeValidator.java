@@ -1,7 +1,3 @@
-//
-// Copyright (c) 2011-2015 Xanadu Consultancy Ltd., 
-//
-
 package com.mtrade.common.validator;
 
 import java.util.Currency;
