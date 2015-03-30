@@ -1,7 +1,3 @@
-//
-// Copyright (c) 2011-2014 Xanadu Consultancy Ltd.,
-//
-
 package com.mtrade.processor;
 
 import org.springframework.boot.SpringApplication;
