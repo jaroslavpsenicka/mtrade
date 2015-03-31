@@ -50,7 +50,7 @@ messaging is generally recommended pattern for applications of this kind -- wher
 requests that need to be processed. These requests can be quickly validated and stored in messaging topic, one or more 
 processor applications may then connect to the same topic and handle the load.
 
-Kafka offers significantly better performance and scalability options, see Quality view below for further details.
+Kafka offers significantly better performance and scalability options, see [Performance tuning section](#performance-tuning) below for further details.
 
 ### Use of Spring 
 
@@ -385,7 +385,7 @@ controlled by the Apache proxy. All instances can post messages into the same Ka
 * **Kafka** -- the messaging topic can be split into partitions, default implementation of Kafka client uses round-robin 
 partition strategy; a large number of messages can be spread into multiple channels (partitions) and processed concurrently.
 * **Processor** -- there should be as many instances of the processor component as partitions; the existing implementation 
-(standalone application) may not be ideal for operations, some kind of cluster management such as Hadoop YARN or similar 
+(standalone application) may not be ideal for operations, some kind of cluster management such as Spring XD, Hadoop YARN or similar 
 may provide better control. It is generally recommended to install one processor module per VM. 
 * **MongoDB** -- there may be one or more replicas created, however there may be only one cluster node used for 
 writing - the statistics calculations performed by the processor module could be directed to a read-only replica. To do 
